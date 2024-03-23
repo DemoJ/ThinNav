@@ -1,63 +1,43 @@
-import sqlite3
-from sqlite3 import Error
+# main.py
+from fastapi import FastAPI, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from . import models, schemas
+from .models import AsyncSessionLocal, engine
+from typing import List,AsyncGenerator
 
-def create_connection(db_file):
-    """ 创建一个数据库连接到SQLite数据库指定的db文件 """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
+app = FastAPI()
 
-    return conn
+# 定义启动事件处理函数
+async def startup_event():
+    # 创建数据库表
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
 
-def create_table(conn, create_table_sql):
-    """ 使用提供的conn连接和create_table_sql语句创建一个表 """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+# 定义关闭事件处理函数
+async def shutdown_event():
+    # 这里可以放置关闭时需要执行的代码
+    pass
 
-def main():
-    database = r"./backend/db/data.db"
+# 注册生命周期事件处理函数
+app.add_event_handler("startup", startup_event)
+app.add_event_handler("shutdown", shutdown_event)
 
-    sql_create_categories_table = """
-    CREATE TABLE IF NOT EXISTS categories (
-        id integer PRIMARY KEY,
-        name text NOT NULL,
-        icon_url text
-    );
-    """
+# 异步依赖项，用于获取数据库session
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session
 
-    sql_create_websites_table = """
-    CREATE TABLE IF NOT EXISTS websites (
-        id integer PRIMARY KEY,
-        category_id integer NOT NULL,
-        name text NOT NULL,
-        icon_url text,
-        description text,
-        url text NOT NULL,
-        FOREIGN KEY (category_id) REFERENCES categories (id)
-    );
-    """
+@app.post("/categories/", response_model=schemas.Category)
+async def create_category(category: schemas.CategoryCreate, db: AsyncSession = Depends(get_db)):
+    db_category = models.Category(**category.model_dump())
+    db.add(db_category)
+    await db.commit()
+    await db.refresh(db_category)
+    return db_category
 
-    # 创建数据库连接
-    conn = create_connection(database)
-
-    # 创建表
-    if conn is not None:
-        # 创建 categories 表
-        create_table(conn, sql_create_categories_table)
-
-        # 创建 websites 表
-        create_table(conn, sql_create_websites_table)
-
-        # 关闭连接
-        conn.close()
-    else:
-        print("无法创建数据库连接。")
-
-if __name__ == '__main__':
-    main()
+@app.get("/categories/", response_model=List[schemas.Category])
+async def read_categories(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(models.Category))
+    categories = result.scalars().all()
+    return categories
