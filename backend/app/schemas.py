@@ -14,7 +14,7 @@ class CategoryCreate(CategoryBase):
 class Category(CategoryBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # 基础Website模型
 class WebsiteBase(BaseModel):
@@ -31,4 +31,4 @@ class WebsiteCreate(WebsiteBase):
 class Website(WebsiteBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
