@@ -3,13 +3,13 @@ import uvicorn
 from fastapi import FastAPI
 from app import models
 from app.models import engine
-from app.categories import categories
+from app import categories,websites
 
 
 app = FastAPI()
 
-app.include_router(categories, tags=["网址分类接口"], prefix="/categories")
-
+app.include_router(categories.router, tags=["分类接口"], prefix="/categories")
+app.include_router(websites.router, tags=["网址接口"], prefix="/websites")
 
 # 定义启动事件处理函数
 async def startup_event():
