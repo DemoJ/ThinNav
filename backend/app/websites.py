@@ -2,15 +2,11 @@ from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app import models,schemas
-from app.models import AsyncSessionLocal
-from typing import List,AsyncGenerator
+from typing import List
+from app.database import get_db
 
 router = APIRouter()
 
-# 异步依赖项，用于获取数据库session
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.post("/", response_model=schemas.Website)
 async def create_website(website: schemas.WebsiteCreate, db: AsyncSession = Depends(get_db)):

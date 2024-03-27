@@ -1,16 +1,8 @@
 # models.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-
-DATABASE_URL = "sqlite+aiosqlite:///backend/db/data.db"  # 注意使用aiosqlite
-Base = declarative_base()
-
-engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.database import Base
 
 # 定义Category模型
 class Category(Base):
@@ -33,3 +25,15 @@ class Website(Base):
     category = relationship("Category", back_populates="websites")
 
 Category.websites = relationship("Website", order_by=Website.order, back_populates="category")
+
+class Admin(Base):
+    __tablename__ = 'admins'
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)

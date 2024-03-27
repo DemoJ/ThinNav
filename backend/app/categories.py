@@ -2,15 +2,10 @@ from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app import models,schemas
-from app.models import AsyncSessionLocal
-from typing import List,AsyncGenerator
+from app.database import get_db
+from typing import List
 
 router=APIRouter()
-
-# 异步依赖项，用于获取数据库session
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.post("/", response_model=schemas.Category)
 async def create_category(category: schemas.CategoryCreate, db: AsyncSession = Depends(get_db)):
