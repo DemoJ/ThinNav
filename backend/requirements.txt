@@ -1,0 +1,8 @@
+fastapi==0.110.0
+python-jose==3.3.0
+pydantic==2.6.4
+SQLAlchemy==2.0.25
+uvicorn==0.29.0
+Werkzeug==3.0.1
+aiosqlite==0.20.0
+python-multipart==0.0.9
