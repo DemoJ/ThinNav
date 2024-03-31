@@ -4,12 +4,13 @@ from sqlalchemy.future import select
 from app import models,schemas
 from typing import List
 from app.database import get_db
+from app.auth import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/", response_model=schemas.Website)
-async def create_website(website: schemas.WebsiteCreate, db: AsyncSession = Depends(get_db)):
+async def create_website(website: schemas.WebsiteCreate, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     db_website = models.Website(**website.model_dump())
     db.add(db_website)
     await db.commit()
@@ -23,7 +24,7 @@ async def read_websites(db: AsyncSession = Depends(get_db)):
     return websites
 
 @router.put("/{website_id}", response_model=schemas.Website)
-async def update_website(website_id: int, website: schemas.WebsiteCreate, db: AsyncSession = Depends(get_db)):
+async def update_website(website_id: int, website: schemas.WebsiteCreate, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     db_website = await db.get(models.Website, website_id)
     if not db_website:
         raise HTTPException(status_code=404, detail="Website not found")
@@ -34,7 +35,7 @@ async def update_website(website_id: int, website: schemas.WebsiteCreate, db: As
     return db_website
 
 @router.delete("/{website_id}", status_code=204)
-async def delete_website(website_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_website(website_id: int, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     db_website = await db.get(models.Website, website_id)
     if not db_website:
         raise HTTPException(status_code=404, detail="Website not found")

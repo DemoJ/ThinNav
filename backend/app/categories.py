@@ -3,12 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app import models,schemas
 from app.database import get_db
+from app.auth import get_current_user
 from typing import List
 
 router=APIRouter()
 
 @router.post("/", response_model=schemas.Category)
-async def create_category(category: schemas.CategoryCreate, db: AsyncSession = Depends(get_db)):
+async def create_category(category: schemas.CategoryCreate, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     db_category = models.Category(**category.model_dump())
     db.add(db_category)
     await db.commit()
@@ -22,7 +23,7 @@ async def read_categories(db: AsyncSession = Depends(get_db)):
     return categories
 
 @router.put("/{category_id}", response_model=schemas.Category)
-async def update_category(category_id: int, category: schemas.CategoryCreate, db: AsyncSession = Depends(get_db)):
+async def update_category(category_id: int, category: schemas.CategoryCreate, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     async with db as session:
         db_category = await session.get(models.Category, category_id)
         if not db_category:
@@ -34,7 +35,7 @@ async def update_category(category_id: int, category: schemas.CategoryCreate, db
         return db_category
 
 @router.delete("/{category_id}", status_code=204)
-async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_category(category_id: int, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):
     async with db as session:
         db_category = await session.get(models.Category, category_id)
         if not db_category:
