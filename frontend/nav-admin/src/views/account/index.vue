@@ -11,50 +11,46 @@ const Infos = reactive({
   newPassword: "",
   confirmPassword: ""
 });
-
 </script>
 
 <template>
   <el-card shadow="never">
     <h3 class="my-8">修改管理密码</h3>
-    <el-form
-      label-position="top"
-      label-width="80px"
-      :model="Infos"
-    >
+    <el-form label-position="top" label-width="80px" :model="Infos">
       <el-form-item label="原密码" prop="oldPassword">
-        <el-input 
-        v-model="Infos.oldPassword" 
-        placeholder="请输入原密码" 
-        clearable 
-        show-password 
-        maxlength="20"/>
+        <el-input
+          v-model="Infos.oldPassword"
+          placeholder="请输入原密码"
+          clearable
+          show-password
+          maxlength="20"
+        />
       </el-form-item>
       <el-form-item label="新密码" prop="newPassword">
-        <el-input 
-        v-model="Infos.newPassword" 
-        placeholder="请输入新密码" 
-        clearable 
-        show-password 
-        maxlength="20"/>
+        <el-input
+          v-model="Infos.newPassword"
+          placeholder="请输入新密码"
+          clearable
+          show-password
+          maxlength="20"
+        />
       </el-form-item>
       <el-form-item label="确认新密码" prop="confirmPassword">
-        <el-input 
-        v-model="Infos.confirmPassword" 
-        placeholder="请再次输入新密码" 
-        clearable 
-        show-password 
-        maxlength="20"/>
+        <el-input
+          v-model="Infos.confirmPassword"
+          placeholder="请再次输入新密码"
+          clearable
+          show-password
+          maxlength="20"
+        />
       </el-form-item>
-      <el-button type="primary">
-        更新信息
-      </el-button>
+      <el-button type="primary"> 更新信息 </el-button>
     </el-form>
   </el-card>
 </template>
 
 <style>
-  .el-form-item {
-    width: 40%;
-  }
+.el-form-item {
+  width: 40%;
+}
 </style>
