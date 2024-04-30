@@ -6,9 +6,9 @@ export default {
   },
   children: [
     {
-      path: "/website/index",
+      path: "/website/category",
       name: "Category",
-      component: () => import("@/views/website/index.vue"),
+      component: () => import("@/views/website/category.vue"),
       meta: {
         title: "网站分类"
       }
