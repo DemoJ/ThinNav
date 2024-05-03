@@ -20,6 +20,7 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
+import axios from 'axios';
 
 defineOptions({
   name: "Login"
@@ -37,25 +38,47 @@ const { title } = useNav();
 
 const ruleForm = reactive({
   username: "admin",
-  password: "admin123"
+  password: ""
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
   loading.value = true;
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      setToken({
-        username: "admin",
-        roles: ["admin"],
-        accessToken: "eyJhbGciOiJIUzUxMiJ9.admin"
-      } as any);
-      // 全部采取静态路由模式
-      usePermissionStoreHook().handleWholeMenus([]);
-      addPathMatch();
-      router.push("/");
-      message("登录成功", { type: "success" });
-    } else {
+      try {
+        // 使用 axios 发送 POST 请求到后端
+        const response = await axios.post('http://localhost:8000/admin/login', {
+          username: ruleForm.username,
+          password: ruleForm.password
+        }, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+        setToken({
+          username: "admin",
+          roles: ["admin"],
+          accessToken: response.data.accessToken
+        } as any);
+        // 全部采取静态路由模式
+        usePermissionStoreHook().handleWholeMenus([]);
+        addPathMatch();
+        router.push("/");
+        message("登录成功", { type: "success" });
+      } catch (error) {
+        // 从响应中提取更多的错误信息
+        const errorMsg = error.response?.data?.detail || '网络错误';
+        if (error.response?.status === 401) {
+          message("登录失败: 用户名或密码错误", { type: "error" });
+        } else {
+          message(`登录失败: ${errorMsg}`, { type: "error" });
+        }
+      } finally {
+        loading.value = false;
+      }
+    }
+    else {
       loading.value = false;
       return fields;
     }
@@ -83,13 +106,8 @@ onBeforeUnmount(() => {
     <img :src="bg" class="wave" />
     <div class="flex-c absolute right-5 top-3">
       <!-- 主题 -->
-      <el-switch
-        v-model="dataTheme"
-        inline-prompt
-        :active-icon="dayIcon"
-        :inactive-icon="darkIcon"
-        @change="dataThemeChange"
-      />
+      <el-switch v-model="dataTheme" inline-prompt :active-icon="dayIcon" :inactive-icon="darkIcon"
+        @change="dataThemeChange" />
     </div>
     <div class="login-container">
       <div class="img">
@@ -102,52 +120,29 @@ onBeforeUnmount(() => {
             <h2 class="outline-none">{{ title }}</h2>
           </Motion>
 
-          <el-form
-            ref="ruleFormRef"
-            :model="ruleForm"
-            :rules="loginRules"
-            size="large"
-          >
+          <el-form ref="ruleFormRef" :model="ruleForm" :rules="loginRules" size="large">
             <Motion :delay="100">
-              <el-form-item
-                :rules="[
-                  {
-                    required: true,
-                    message: '请输入账号',
-                    trigger: 'blur'
-                  }
-                ]"
-                prop="username"
-              >
-                <el-input
-                  v-model="ruleForm.username"
-                  clearable
-                  placeholder="账号"
-                  :prefix-icon="useRenderIcon(User)"
-                />
+              <el-form-item :rules="[
+                {
+                  required: true,
+                  message: '请输入账号',
+                  trigger: 'blur'
+                }
+              ]" prop="username">
+                <el-input v-model="ruleForm.username" clearable placeholder="账号" :prefix-icon="useRenderIcon(User)" />
               </el-form-item>
             </Motion>
 
             <Motion :delay="150">
               <el-form-item prop="password">
-                <el-input
-                  v-model="ruleForm.password"
-                  clearable
-                  show-password
-                  placeholder="密码"
-                  :prefix-icon="useRenderIcon(Lock)"
-                />
+                <el-input v-model="ruleForm.password" clearable show-password placeholder="密码"
+                  :prefix-icon="useRenderIcon(Lock)" />
               </el-form-item>
             </Motion>
 
             <Motion :delay="250">
-              <el-button
-                class="w-full mt-4"
-                size="default"
-                type="primary"
-                :loading="loading"
-                @click="onLogin(ruleFormRef)"
-              >
+              <el-button class="w-full mt-4" size="default" type="primary" :loading="loading"
+                @click="onLogin(ruleFormRef)">
                 登录
               </el-button>
             </Motion>

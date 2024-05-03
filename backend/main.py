@@ -6,9 +6,23 @@ from app import models
 from app.models import Admin
 from app import categories,websites,admin
 from app.database import engine,AsyncSessionLocal
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:8848",  # 允许的源
+    "http://127.0.0.1:8848"   # 如果客户端也可能从这个地址访问
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # 指定允许的源列表
+    allow_credentials=True,
+    allow_methods=["*"],    # 允许所有方法（如 POST, GET 等）
+    allow_headers=["*"],    # 允许所有头部
+)
 
 app.include_router(categories.router, tags=["分类接口"], prefix="/categories")
 app.include_router(websites.router, tags=["网址接口"], prefix="/websites")
