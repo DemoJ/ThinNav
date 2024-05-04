@@ -56,10 +56,22 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
+
+        // 当前时间
+        const now = Date.now();
+
+        // 15分钟（以毫秒为单位）
+        const fifteenMinutes = 15 * 60 * 1000;
+
+        // 15分钟后的时间点
+        const expires = now + fifteenMinutes;
+
+
         setToken({
           username: "admin",
           roles: ["admin"],
-          accessToken: response.data.accessToken
+          accessToken: response.data.access_token,
+          expires: expires
         } as any);
         // 全部采取静态路由模式
         usePermissionStoreHook().handleWholeMenus([]);
