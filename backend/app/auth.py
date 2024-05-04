@@ -11,7 +11,7 @@ SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/login")
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: timedelta = None,refresh_expires_delta: timedelta = timedelta(days=30)):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta

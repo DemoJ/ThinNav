@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import axios from 'axios';
+import { http } from "@/utils/http";
+import { baseUrlApi } from "@/api/utils";
 import { reactive } from "vue";
 
 defineOptions({
@@ -49,11 +50,13 @@ const submitPasswordChange = async () => {
     return;
   }
 
+  const data = {
+          old_password: Infos.oldPassword,
+          new_password: Infos.newPassword
+        };
+
   try {
-    const response = await axios.post('http://localhost:8000/admin/change-password', {
-      old_password: Infos.oldPassword,
-      new_password: Infos.newPassword,
-    }, {
+    const response = await http.post(baseUrlApi('admin/change-password'), { data }, {
       headers: {
         'Authorization': `Bearer ${token}` // 使用 Bearer 方案添加令牌
       }

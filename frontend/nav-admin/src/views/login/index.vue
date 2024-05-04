@@ -20,7 +20,7 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
-import axios from 'axios';
+import { getLogin } from "@/api/user";
 
 defineOptions({
   name: "Login"
@@ -48,15 +48,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     if (valid) {
       try {
         // 使用 axios 发送 POST 请求到后端
-        const response = await axios.post('http://localhost:8000/admin/login', {
-          username: ruleForm.username,
-          password: ruleForm.password
-        }, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
-
+        const response = await getLogin({ username: ruleForm.username,password: ruleForm.password });
+        console.log(response);
         // 当前时间
         const now = Date.now();
 
@@ -70,7 +63,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         setToken({
           username: "admin",
           roles: ["admin"],
-          accessToken: response.data.access_token,
+          accessToken: response.data.accessToken,
           expires: expires
         } as any);
         // 全部采取静态路由模式
