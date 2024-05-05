@@ -4,12 +4,13 @@ from sqlalchemy.future import select
 from app.models import Admin
 from app.schemas import ChangePasswordRequest
 from app.database import get_db
-from fastapi.security import OAuth2PasswordRequestForm
-from app.auth import create_access_token, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
+from app.auth import create_tokens, get_current_user, refresh_token
 from datetime import timedelta
 
 router = APIRouter()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/login")
 
 @router.post("/login")
 async def login_for_access_token(
@@ -24,10 +25,40 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     accessToken_expires = timedelta(minutes=15)
-    accessToken = create_access_token(
+    accessToken, refreshToken = create_tokens(
         data={"sub": admin.username}, expires_delta=accessToken_expires
     )
-    return {"success": 1, "data": {"accessToken": accessToken, "token_type": "bearer"}}
+    # 更新数据库中的 refreshToken
+    admin.refreshToken = refreshToken
+    db.add(admin)
+    await db.commit()
+    print(f"Login successful. AccessToken: {accessToken}, RefreshToken: {refreshToken}")
+    return {
+        "success": 1,
+        "data": {
+            "accessToken": accessToken,
+            "refreshToken": refreshToken,
+            "token_type": "bearer",
+        },
+    }
+
+
+@router.post("/refresh-token")
+async def refresh_access_token(refreshToken: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    try:
+        print(refreshToken)
+        token_data = await refresh_token(refreshToken, db)
+        return {
+            "success": 1,
+            "data": {
+                "accessToken": token_data['accessToken'],
+                "refreshToken": token_data['refreshToken'],
+                "token_type": "bearer"
+            }
+        }
+    except HTTPException as e:
+        raise e
+
 
 @router.post("/change-password")
 async def change_password(

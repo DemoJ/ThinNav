@@ -31,6 +31,7 @@ class Admin(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     password_hash = Column(String)
+    refreshToken = Column(String, nullable=True)  # 添加 refresh_token 字段
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
