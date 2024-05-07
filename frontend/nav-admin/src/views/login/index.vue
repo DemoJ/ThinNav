@@ -20,8 +20,8 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
-import { getLogin } from "@/api/user";
-import refreshToken from "mock/refreshToken";
+import { getLogin } from "@/api/login";
+
 
 defineOptions({
   name: "Login"
@@ -51,23 +51,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         // 使用 axios 发送 POST 请求到后端
         const response = await getLogin({ username: ruleForm.username, password: ruleForm.password });
         console.log(response);
+        setToken(response.data);
 
-        // 当前时间
-        const now = new Date();
-
-        // 15分钟（以毫秒为单位）
-        const fifteenMinutes = 1 * 60 * 1000; // 注意这里之前的代码将分钟数设置成了1而不是15，已修改
-
-        // 15分钟后的时间点
-        const expires = new Date(now.getTime() + fifteenMinutes);
-
-        setToken({
-          username: "admin",
-          roles: ["admin"],
-          accessToken: response.data.accessToken,
-          refreshToken: response.data.refreshToken,
-          expires: expires
-        } as any);
         // 全部采取静态路由模式
         usePermissionStoreHook().handleWholeMenus([]);
         addPathMatch();

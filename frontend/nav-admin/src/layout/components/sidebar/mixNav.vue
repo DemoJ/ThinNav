@@ -95,7 +95,7 @@ watch(
       <!-- 全屏 -->
       <FullScreen id="full-screen" />
       <!-- 消息通知 -->
-      <Notice id="header-notice" />
+      <!-- <Notice id="header-notice" /> -->
       <!-- 退出登录 -->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover select-none">

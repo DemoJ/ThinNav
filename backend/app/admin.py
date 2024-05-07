@@ -6,7 +6,7 @@ from app.schemas import ChangePasswordRequest
 from app.database import get_db
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from app.auth import create_tokens, get_current_user, refresh_token
-from datetime import timedelta
+from datetime import timedelta,datetime
 
 router = APIRouter()
 
@@ -24,9 +24,19 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    accessToken_expires = timedelta(minutes=15)
+    # 获取当前时间
+    current_time = datetime.now()
+
+    add_expires = timedelta(minutes=1)
+
+    # 将当前时间加上一分钟
+    minute_later = current_time + add_expires
+
+    # 转换为时间戳
+    accessToken_expires = int(minute_later.timestamp()* 1000)
+
     accessToken, refreshToken = create_tokens(
-        data={"sub": admin.username}, expires_delta=accessToken_expires
+        data={"sub": admin.username}, expires_delta=add_expires
     )
     # 更新数据库中的 refreshToken
     admin.refreshToken = refreshToken
@@ -36,9 +46,11 @@ async def login_for_access_token(
     return {
         "success": 1,
         "data": {
+            "username": admin.username,
+            "roles": ["admin"],
             "accessToken": accessToken,
             "refreshToken": refreshToken,
-            "token_type": "bearer",
+            "expires": accessToken_expires
         },
     }
 

@@ -6,7 +6,7 @@ from app import models
 from app.models import Admin
 from app import categories,websites,admin
 from app.database import engine,AsyncSessionLocal
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
