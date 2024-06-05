@@ -53,7 +53,6 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         console.log(response);
         setToken(response.data);
 
-<<<<<<< HEAD
         // 当前时间
         const now = new Date();
 
@@ -70,8 +69,6 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           refreshToken: response.data.refreshToken,
           expires: expires
         } as any);
-=======
->>>>>>> d227d92b60f057fd21b65d54200f7ee98b1e441b
         // 全部采取静态路由模式
         usePermissionStoreHook().handleWholeMenus([]);
         addPathMatch();
