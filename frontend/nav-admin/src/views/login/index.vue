@@ -57,7 +57,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         const now = new Date();
 
         // 15分钟（以毫秒为单位）
-        const fifteenMinutes = 30 * 60 * 1000; // 注意这里之前的代码将分钟数设置成了1而不是15，已修改
+        const fifteenMinutes = 15 * 60 * 1000; // 注意这里之前的代码将分钟数设置成了1而不是15，已修改
 
         // 15分钟后的时间点
         const expires = new Date(now.getTime() + fifteenMinutes);
