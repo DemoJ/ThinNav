@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { categoryData } from "./data";
 import { message } from "@/utils/message";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
+import { getCategories } from "@/api/category";
+import { onMounted, ref } from "vue";
 
 
 defineOptions({
   // name 作为一种规范最好必须写上并且和路由的name保持一致
   name: "Category"
 });
+
+// const categoryData = await getCategories();
+const categoryData = ref([]);
 
 const columns: TableColumnList = [
   {
@@ -34,6 +38,12 @@ const handleEdit = (row) => {
   const handleDelete = (row) => {
     message(`您删除了数据`);
   };
+
+  // 页面挂载时执行操作
+  onMounted(async () => {
+    categoryData.value = await getCategories();
+    // console.log(categoryData.value);
+  });
 </script>
 
 <template>

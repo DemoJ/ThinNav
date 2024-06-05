@@ -1,18 +1,3 @@
-const categoryData = [
-  {
-    name: "常用",
-    order: 1
-  },
-  {
-    name: "技术",
-    order: 2
-  },
-  {
-    name: "工具",
-    order: 3
-  }
-];
-
 const websiteData = [
   {
     name: "谷歌",
@@ -34,4 +19,4 @@ const websiteData = [
   }
 ];
 
-export { categoryData, websiteData };
+export { websiteData };
