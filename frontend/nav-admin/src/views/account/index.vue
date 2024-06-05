@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { http } from "@/utils/http";
-import { baseUrlApi } from "@/api/utils";
 import { reactive } from "vue";
+import {changeUserPassword} from "@/api/user";
+import { message } from "@/utils/message";
 
 defineOptions({
   // name 作为一种规范最好必须写上并且和路由的name保持一致
@@ -16,37 +16,7 @@ const Infos = reactive({
 
 const submitPasswordChange = async () => {
   if (Infos.newPassword !== Infos.confirmPassword) {
-    alert('新密码和确认新密码不匹配');
-    return;
-  }
-
-  // 假设的 getCookie 函数，添加了返回类型注解
-  const getCookie = (name: string): string | null => {
-    let cookieArray = document.cookie.split('; ');
-    for (let cookie of cookieArray) {
-      let [cookieName, cookieValue] = cookie.split('=');
-      if (cookieName === name) {
-        return cookieValue;
-      }
-    }
-    return null;
-  };
-
-  let token: string | undefined; // 声明 token 变量可能为 undefined
-
-  try {
-    const encodedJson = getCookie('authorized-token'); // 从 cookie 中获取编码的 JSON
-    if (encodedJson) {
-      const decodedJson = decodeURIComponent(encodedJson); // 解码 URL 编码的字符串
-      const tokenData = JSON.parse(decodedJson); // 解析 JSON 字符串
-      token = tokenData.accessToken; // 从解析的 JSON 对象中获取 accessToken
-    }
-  } catch (error) {
-    console.error("Error parsing token data:", error);
-  }
-
-  if (!token) {
-    alert('无法获取访问令牌，请重新登录');
+    message('新密码和确认新密码不匹配', { type: "error" });
     return;
   }
 
@@ -54,17 +24,15 @@ const submitPasswordChange = async () => {
           old_password: Infos.oldPassword,
           new_password: Infos.newPassword
         };
-
+console.log("111");
   try {
-    const response = await http.post(baseUrlApi('admin/change-password'), { data }, {
-      headers: {
-        'Authorization': `Bearer ${token}` // 使用 Bearer 方案添加令牌
-      }
-    });
-    alert("密码更新成功");
+    console.log("112");
+    const response = await changeUserPassword(data);
+    message("密码更新成功", { type: "success" });
+    console.log(response);
   } catch (error) {
     console.error('密码更新失败', error);
-    alert('密码更新失败，请重试');
+    message('密码更新失败，请重试', { type: "error" });
   }
 };
 

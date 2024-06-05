@@ -20,8 +20,8 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
-import { getLogin } from "@/api/user";
-import refreshToken from "mock/refreshToken";
+import { getLogin } from "@/api/login";
+
 
 defineOptions({
   name: "Login"
@@ -51,7 +51,9 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         // 使用 axios 发送 POST 请求到后端
         const response = await getLogin({ username: ruleForm.username, password: ruleForm.password });
         console.log(response);
+        setToken(response.data);
 
+<<<<<<< HEAD
         // 当前时间
         const now = new Date();
 
@@ -68,6 +70,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           refreshToken: response.data.refreshToken,
           expires: expires
         } as any);
+=======
+>>>>>>> d227d92b60f057fd21b65d54200f7ee98b1e441b
         // 全部采取静态路由模式
         usePermissionStoreHook().handleWholeMenus([]);
         addPathMatch();
