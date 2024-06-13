@@ -51,7 +51,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         // 使用 axios 发送 POST 请求到后端
         const response = await getLogin({ username: ruleForm.username, password: ruleForm.password });
         console.log(response);
-        setToken(response.data);
+        // setToken(response.data);
 
         // 当前时间
         const now = new Date();
