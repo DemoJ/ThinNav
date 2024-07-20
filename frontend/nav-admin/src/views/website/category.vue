@@ -11,7 +11,7 @@ defineOptions({
   name: "Category"
 });
 
-// const categoryData = await getCategories();
+
 const categoryData = ref([]);
 
 const columns: TableColumnList = [

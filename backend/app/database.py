@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 # 对于SQLite异步使用示例: DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 # 对于PostgreSQL异步使用示例: DATABASE_URL = "postgresql+asyncpg://user:password@localhost/dbname"
 DATABASE_URL = "sqlite+aiosqlite:///db/data.db"
-# DATABASE_URL = "sqlite+aiosqlite:///C:/Users/dy002/Desktop/code/nav-site/backend/db/data.db"
+
 # 创建异步引擎
 engine = create_async_engine(DATABASE_URL, echo=True)
 
