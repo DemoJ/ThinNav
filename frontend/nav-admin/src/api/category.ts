@@ -10,9 +10,19 @@ export type CategoryResult = {
   // 其他字段根据你的实际 API 返回值
 };
 
+interface CategoryUpdateData {
+  name?: string;
+  icon_url?: string;
+  order?: number;
+  // 其他你需要更新的字段
+}
+
 export const getCategories = async () => {
   try {
-    const data = await http.request<CategoryResult[]>("get", baseUrlApi("categories/"));
+    const data = await http.request<CategoryResult[]>(
+      "get",
+      baseUrlApi("categories/")
+    );
     return data;
   } catch (error) {
     console.error("Failed to fetch categories:", error);
@@ -20,5 +30,27 @@ export const getCategories = async () => {
   }
 };
 
-
-
+export const updateCategory = async (
+  categoryId: string,
+  updateData: CategoryUpdateData
+) => {
+  try {
+    const url = baseUrlApi(`categories/${categoryId}`);
+    const data = await http.request<CategoryUpdateData>(
+      "put",
+      url,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      },
+      {
+        data: updateData
+      }
+    );
+    return data;
+  } catch (error) {
+    console.error(`Failed to update category ${categoryId}:`, error);
+    return null;
+  }
+};
