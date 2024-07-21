@@ -54,3 +54,20 @@ export const updateCategory = async (
     return null;
   }
 };
+
+export const delCategorie = async (categoryId: string) => {
+  try {
+    const data = await http.request(
+      "delete",
+      baseUrlApi(`categories/${categoryId}`)
+    );
+    if (data.status === 204) {
+      console.log("Category deleted successfully");
+      return true;
+    }
+    return data; // 处理其他可能的响应
+  } catch (error) {
+    console.error("Failed to delete categories:", error);
+    return null;
+  }
+};
