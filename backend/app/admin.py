@@ -10,10 +10,30 @@ from datetime import timedelta,datetime
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
+
+@router.post("/token")
+async def login_for_access_token(
+form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
+):
+    admin = await db.execute(select(Admin).where(Admin.username == form_data.username))
+    admin = admin.scalars().first()
+    if not admin or not admin.check_password(form_data.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    add_expires = timedelta(minutes=1)
+
+    accessToken= create_tokens(
+        data={"sub": admin.username}, expires_delta=add_expires
+    )[0]
+    return {"access_token": accessToken, "token_type": "bearer"}
 
 @router.post("/login")
-async def login_for_access_token(
+async def admin_login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     admin = await db.execute(select(Admin).where(Admin.username == form_data.username))

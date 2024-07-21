@@ -9,7 +9,7 @@ from app.models import Admin
 
 SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
 ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
 def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_delta: timedelta = timedelta(days=30)):
     to_encode = data.copy()
@@ -27,6 +27,7 @@ def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_d
     return accessToken, refreshToken
 
 async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    print(f"Received token: {token}")  # 添加这行来检查 token 的值
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
