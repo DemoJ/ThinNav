@@ -1,6 +1,6 @@
 import { message } from "@/utils/message";
 import forms, { type FormProps } from "./form.vue";
-import { updateCategory, delCategorie } from "@/api/category";
+import { updateCategory, delCategorie, creatCategory } from "@/api/category";
 import { addDialog } from "@/components/ReDialog";
 
 export function handleEdit(row) {
@@ -37,12 +37,49 @@ export function handleEdit(row) {
         const updatedCategory = await updateCategory(row.id, updatedData);
 
         if (updatedCategory) {
-          console.log("Category updated successfully:", updatedCategory);
+          message("Category updated successfully:");
         } else {
-          console.log("Failed to update category");
+          message("Failed to update category");
         }
 
         message(`您点击了确定按钮，当前表单数据为 ${text}`);
+      }
+    }
+  });
+}
+
+export function handleCreat() {
+  addDialog({
+    width: "30%",
+    title: "新建分类",
+    contentRenderer: () => forms,
+    props: {
+      // 赋默认值
+      formInline: {
+        name: "",
+        icon: "",
+        order: ""
+      }
+    },
+    closeCallBack: async ({ options, index, args }) => {
+      console.log(options, index, args);
+      const { formInline } = options.props as FormProps;
+      let text = "";
+      if (args?.command === "cancel") {
+        text = "您点击了取消按钮";
+        message(text);
+      } else if (args?.command === "sure") {
+        const creatData = {
+          name: formInline.name,
+          icon_url: formInline.icon,
+          order: Number(formInline.order)
+        };
+        const createdCategory = await creatCategory(creatData);
+        if (createdCategory) {
+          message("Category creat successfully:");
+        } else {
+          message("Failed to creat category");
+        }
       }
     }
   });
@@ -60,13 +97,10 @@ export function handleDelete(row) {
         text = "您点击了取消按钮";
         message(text);
       } else if (args?.command === "sure") {
-        const delCategory = await delCategorie(row.id);
-
-        if (delCategory) {
-          message("Category delete successfully:", delCategory);
-        } else {
-          message("Failed to delete category");
-        }
+        await delCategorie(row.id);
+        message("Category delete successfully");
+      } else {
+        message("Failed to delete category");
       }
     }
   });

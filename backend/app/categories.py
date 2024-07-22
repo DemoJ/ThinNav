@@ -42,4 +42,4 @@ async def delete_category(category_id: int, current_user:models.Admin = Depends(
             raise HTTPException(status_code=404, detail="Category not found")
         await session.delete(db_category)
         await session.commit()
-        return {"ok": True}
+        return

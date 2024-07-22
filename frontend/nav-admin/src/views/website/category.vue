@@ -3,7 +3,7 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import { getCategories } from "@/api/category";
 import { onMounted, ref } from "vue";
-import { handleEdit, handleDelete } from "./operate";
+import { handleEdit, handleDelete,handleCreat } from "./operate";
 
 defineOptions({
   // name 作为一种规范最好必须写上并且和路由的name保持一致
@@ -41,7 +41,9 @@ onMounted(async () => {
 <template>
   <el-card shadow="never">
     <div>
-      <el-button :icon="useRenderIcon(AddFill)">新建分类</el-button>
+      <el-button :icon="useRenderIcon(AddFill)" @click="handleCreat()"
+        >新建分类</el-button
+      >
     </div>
     <pure-table :data="categoryData" :columns="columns">
       <template #operation="{ row }">
