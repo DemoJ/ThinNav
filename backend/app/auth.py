@@ -4,8 +4,8 @@ from sqlalchemy.future import select
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from app.database import get_db
-from app.models import Admin
+from .database import get_db
+from .models import Admin
 
 SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
 ALGORITHM = "HS256"
