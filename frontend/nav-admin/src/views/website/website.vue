@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { websiteData } from "./data";
+import { websiteData } from "./webData";
 import { message } from "@/utils/message";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
@@ -31,7 +31,7 @@ const columns: TableColumnList = [
   },
   {
     label: "描述",
-    prop: "describe"
+    prop: "description"
   },
   {
     label: "分类",
