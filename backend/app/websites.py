@@ -19,9 +19,26 @@ async def create_website(website: schemas.WebsiteCreate, current_user:models.Adm
 
 @router.get("/", response_model=List[schemas.Website])
 async def read_websites(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(models.Website))
-    websites = result.scalars().all()
-    return websites
+    stmt = (
+        select(models.Website, models.Category.name.label('category_name'))
+        .join(models.Category, models.Website.category_id == models.Category.id)
+    )
+    result = await db.execute(stmt)
+    websites = result.all()
+    # Process the result to match your response model
+    response = []
+    for website, category_name in websites:
+        response.append(schemas.Website(
+            id=website.id,
+            name=website.name,
+            icon_url=website.icon_url,
+            description=website.description,
+            order=website.order,
+            url=website.url,
+            category_id=website.category_id,
+            category_name=category_name
+        ))
+    return response
 
 @router.put("/{website_id}", response_model=schemas.Website)
 async def update_website(website_id: int, website: schemas.WebsiteCreate, current_user:models.Admin = Depends(get_current_user),db: AsyncSession = Depends(get_db)):

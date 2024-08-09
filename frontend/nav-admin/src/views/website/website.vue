@@ -35,7 +35,7 @@ const columns: TableColumnList = [
   },
   {
     label: "分类",
-    prop: "category"
+    prop: "category_name"
   },
   {
     label: "操作",

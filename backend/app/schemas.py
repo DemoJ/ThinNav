@@ -30,6 +30,7 @@ class WebsiteCreate(WebsiteBase):
 
 class Website(WebsiteBase):
     id: int
+    category_name: str  # 新增字段
     class Config:
         from_attributes = True
 

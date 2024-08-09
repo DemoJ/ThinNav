@@ -9,6 +9,7 @@ export type webResult = {
   icon_url: string;
   url: string;
   category_id: number;
+  category_name: string;
   order: number;
   // 其他字段根据你的实际 API 返回值
 };
@@ -19,6 +20,7 @@ interface webData {
   icon_url?: string;
   url?: string;
   category_id?: number;
+
   order?: number;
   // 其他你需要更新的字段
 }
