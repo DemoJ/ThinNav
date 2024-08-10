@@ -1,7 +1,7 @@
 <template>
   <div class="website-card" @click="navigateToUrl(link.url)">
     <div class="website-icon">
-      <img :src="link.icon" alt="icon" />
+      <img :src="link.icon_url" alt="icon" />
     </div>
     <div class="website-info">
       <p class="website-name">{{ link.name }}</p>

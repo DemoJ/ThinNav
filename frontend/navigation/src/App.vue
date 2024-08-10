@@ -2,7 +2,6 @@
   <div id="app">
     <div class="header-image"></div>
     <div class="main-container">
-      <!-- 创建一个新的容器包含AppSidebar和content -->
       <AppSidebar :categories="categories" />
       <AppContent :categories="categories" />
     </div>
@@ -12,6 +11,7 @@
 <script>
 import AppSidebar from "./components/AppSidebar.vue";
 import AppContent from './components/AppContent.vue';
+import { getWebsites, getCategories } from './api/api';
 
 export default {
   name: "App",
@@ -21,33 +21,39 @@ export default {
   },
   data() {
     return {
-      categories: [
-        {
-          id: 1,
-          name: "社交媒体",
-          icon: "paper-plane",
-          links: [
-            { icon:"https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico", name: "Facebook",description: "Facebook 社交平台", url: "https://www.facebook.com" },
-            { icon:"https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico", name: "Facebook",description: "Facebook 社交平台", url: "https://www.facebook.com" },
-            { icon:"https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico", name: "Facebook",description: "Facebook 社交平台", url: "https://www.facebook.com" },
-            { icon:"https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico", name: "Facebook",description: "Facebook 社交平台", url: "https://www.facebook.com" },
-            { icon:"https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico", name: "Facebook",description: "Facebook 社交平台", url: "https://www.facebook.com" },
-            // 其他社交媒体网站...
-          ],
-        },
-        {
-          id: 2,
-          name: "搜索引擎",
-          icon: "sun",
-          links: [
-            { icon: "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png", name: "Google",description: "Google 搜索引擎", url: "https://www.google.com" },
-            // 其他搜索引擎网站...
-          ],
-        },
-        // 其他类别...
-      ],
+      categories: [],
+      websites: []
     };
   },
+  async created() {
+    try {
+      const [categoriesResponse, websitesResponse] = await Promise.all([
+        getCategories(),
+        getWebsites()
+      ]);
+
+      // 确保从响应数据中提取正确的数据
+      const categories = categoriesResponse; // 从 getCategories 中直接获取数据
+      const websites = websitesResponse.data; // 从 getWebsites 中提取 data 字段
+      console.log(websites);
+
+
+      // 确保 websites 是数组
+      if (!Array.isArray(websites)) {
+        throw new Error('Websites data is not an array');
+      }
+
+      // 对分类和网址进行排序并组合
+      this.categories = categories.map(category => ({
+        ...category,
+        websites: websites
+          .filter(website => website.category_id === category.id)
+          .sort((a, b) => a.order - b.order) // 按网址 order 排序
+      })).sort((a, b) => a.order - b.order); // 按分类 order 排序
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 };
 </script>
 

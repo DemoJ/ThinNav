@@ -3,8 +3,8 @@
     <div v-for="category in categories" :key="category.id" class="category">
       <p :id="category.name" class="category-name">{{ category.name }}</p>
       <div class="card-container">
-        <div v-for="link in category.links" :key="link.url" class="card">
-          <WebsiteCard :link="link" />
+        <div v-for="website in category.websites" :key="website.id" class="card">
+          <WebsiteCard :link="website" />
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@ export default {
 }
 
 .category {
-  margin-bottom:40px ;
+  margin-bottom: 40px;
 }
 
 .card-container {
@@ -48,7 +48,6 @@ export default {
 }
 
 .category-name {
-  /** 文本1 */
   font-size: 16px;
   font-weight: 400;
   letter-spacing: 0px;
