@@ -18,7 +18,9 @@ async def create_category(category: schemas.CategoryCreate, current_user:models.
 
 @router.get("/", response_model=List[schemas.Category])
 async def read_categories(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(models.Category))
+    result = await db.execute(
+        select(models.Category).order_by(models.Category.order)
+    )
     categories = result.scalars().all()
     return categories
 

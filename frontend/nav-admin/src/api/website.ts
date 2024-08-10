@@ -20,25 +20,36 @@ interface webData {
   icon_url?: string;
   url?: string;
   category_id?: number;
-
   order?: number;
   // 其他你需要更新的字段
 }
 
-export const getWebs = async () => {
+export const getWebs = async ({
+  page = 1,
+  limit = 10
+}: {
+  page: number;
+  limit: number;
+}) => {
   try {
-    const data = await http.request<webResult[]>(
+    const data = await http.request<{ data: webResult[]; total: number }>(
       "get",
-      baseUrlApi("websites/")
+      baseUrlApi("websites/"),
+      {
+        params: {
+          skip: (page - 1) * limit, // 计算跳过的条数
+          limit: limit
+        }
+      }
     );
     return data;
   } catch (error) {
     console.error("Failed to fetch websites:", error);
-    return [];
+    return { data: [], total: 0 }; // 返回空数据并确保分页控件正常工作
   }
 };
 
-export const updateWebs = async (webId: string, updateData: webData) => {
+export const updateWeb = async (webId: string, updateData: webData) => {
   try {
     const url = baseUrlApi(`websites/${webId}`);
     const data = await http.request<webData>(
@@ -60,11 +71,11 @@ export const updateWebs = async (webId: string, updateData: webData) => {
   }
 };
 
-export const delCategorie = async (webId: string) => {
+export const delWeb = async (webId: string) => {
   return http.request("delete", baseUrlApi(`websites/${webId}`));
 };
 
-export const creatCategory = async (creatData: webData) => {
+export const creatWeb = async (creatData: webData) => {
   try {
     const url = baseUrlApi(`websites/`);
     const data = await http.request<webData>(
@@ -81,7 +92,7 @@ export const creatCategory = async (creatData: webData) => {
     );
     return data;
   } catch (error) {
-    console.error(`Failed to creat category:`, error);
+    console.error(`Failed to creat website:`, error);
     return null;
   }
 };

@@ -1,5 +1,5 @@
 import { message } from "@/utils/message";
-import forms, { type FormProps } from "./form.vue";
+import forms, { type FormProps } from "./cateForm.vue";
 import { updateCategory, delCategorie, creatCategory } from "@/api/category";
 import { addDialog } from "@/components/ReDialog";
 

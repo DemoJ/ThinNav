@@ -1,6 +1,7 @@
 # schemas.py
 from pydantic import BaseModel
 from typing import Optional
+from typing import List
 
 # 基础Category模型
 class CategoryBase(BaseModel):
@@ -30,9 +31,13 @@ class WebsiteCreate(WebsiteBase):
 
 class Website(WebsiteBase):
     id: int
-    category_name: str  # 新增字段
+    category_name: Optional[str] = None  # 修改为可选字段
     class Config:
         from_attributes = True
+
+class PaginatedWebsites(BaseModel):
+    data: List[Website]
+    total: int
 
 class ChangePasswordRequest(BaseModel):
     old_password: str

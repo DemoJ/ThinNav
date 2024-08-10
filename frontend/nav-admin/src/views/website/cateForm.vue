@@ -4,6 +4,7 @@ import { ref } from "vue";
 // 声明 props 类型
 export interface FormProps {
   formInline: {
+    category_id: any;
     name: string;
     icon: string;
     order: number;
