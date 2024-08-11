@@ -14,6 +14,7 @@ import NProgress from "../progress";
 import { getToken, setToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import { da } from "element-plus/es/locales.mjs";
+import { router } from "@/router";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -143,6 +144,12 @@ class PureHttp {
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
+
+        // 检查是否为401错误，若是则重定向到登录页面
+        if (error.response && error.response.status === 401) {
+          // 401则退出登录
+          useUserStoreHook().logOut();
+        }
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }
