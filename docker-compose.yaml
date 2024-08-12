@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ThinNav
+    ports:
+      - "8200:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
