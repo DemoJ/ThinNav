@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: ThinNav
     ports:
-      - "8200:80"
+      - "8888:8888"
     networks:
       - app-network
 
