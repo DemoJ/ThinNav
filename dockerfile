@@ -44,4 +44,4 @@ COPY backend/ .
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
 # 启动 FastAPI 应用和 Nginx 服务
-CMD uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g "daemon off;"
+CMD uvicorn main:app --host 0.0.0.0 --port 8000 & nginx -g "daemon off;"
