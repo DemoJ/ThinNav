@@ -2,7 +2,7 @@
   <div class="AppSidebar">
     <ul>
       <li v-for="category in categories" :key="category.id">
-        <font-awesome-icon :icon="['far', category.icon_url]" class="icon" /> <!-- 图标 -->
+        <i :class="`far fa-${category.icon_url}`" class="icon"></i> <!-- 使用类名显示图标 -->
         <a :href="'#' + category.name">{{ category.name }}</a>
       </li>
     </ul>
