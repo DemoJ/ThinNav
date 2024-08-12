@@ -41,7 +41,7 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 
 # 复制并配置 FastAPI 应用
 COPY --from=backend-build /app /app
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
 # 启动 FastAPI 应用和 Nginx 服务
 CMD uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g "daemon off;"
