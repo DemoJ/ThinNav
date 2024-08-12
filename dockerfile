@@ -3,7 +3,7 @@ FROM python:3.10-slim as backend-build
 
 WORKDIR /app
 
-# 复制后端代码并安装依赖
+# 复制后端代码和安装依赖
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -35,25 +35,28 @@ RUN pnpm build
 # 第四步：构建最终的 Python + Nginx 镜像
 FROM python:3.10-slim
 
-# 安装 Nginx 和 supervisor
+# 安装 Nginx 和 Uvicorn
 RUN apt-get update && \
     apt-get install -y nginx && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    pip install uvicorn
 
 # 复制前端构建的文件
 COPY --from=frontend-user-build /app/dist /usr/share/nginx/html/user
 COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 
-# 复制并配置 FastAPI 应用
+# 复制 FastAPI 应用和依赖
 COPY --from=backend-build /app /app
+
+# 复制并配置 Nginx
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
-# 安装 Uvicorn
-RUN pip install uvicorn
+# 设置工作目录
+WORKDIR /app
 
 # 暴露端口
 EXPOSE 8000 80
 
 # 启动 FastAPI 应用和 Nginx 服务
-CMD uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g "daemon off;"
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
