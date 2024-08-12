@@ -24,7 +24,7 @@ RUN pnpm build
 # 第三步：构建最终的 Python + Nginx 镜像
 FROM python:3.10-slim
 
-# 安装 Nginx 和 supervisor
+# 安装 Nginx
 RUN apt-get update && \
     apt-get install -y nginx && \
     apt-get clean && \

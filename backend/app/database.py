@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 # 数据库URL，适用于异步数据库引擎
 # 对于SQLite异步使用示例: DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 # 对于PostgreSQL异步使用示例: DATABASE_URL = "postgresql+asyncpg://user:password@localhost/dbname"
-# 测试路径
+# # 测试路径
 # DATABASE_URL = "sqlite+aiosqlite:///backend/db/data.db"
 
 # 正式路径
