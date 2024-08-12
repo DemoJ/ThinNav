@@ -130,7 +130,8 @@
     "vite-svg-loader": "^5.1.0",
     "vue-eslint-parser": "^9.4.2",
     "vue-tsc": "^1.8.27",
-    "vue-demi": "^0.14.10"
+    "vue-demi": "^0.14.10",
+    "tippy.js": "^6.3.7"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0",
