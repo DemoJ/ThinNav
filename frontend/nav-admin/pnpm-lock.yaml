@@ -241,6 +241,9 @@ devDependencies:
   vite-svg-loader:
     specifier: ^5.1.0
     version: 5.1.0(vue@3.4.21)
+  vue-demi:
+    specifier: ^0.14.10
+    version: 0.14.10(vue@3.4.21)
   vue-eslint-parser:
     specifier: ^9.4.2
     version: 9.4.2(eslint@8.57.0)
@@ -1999,7 +2002,7 @@ packages:
       '@types/web-bluetooth': 0.0.20
       '@vueuse/metadata': 10.9.0
       '@vueuse/shared': 10.9.0(vue@3.4.21)
-      vue-demi: 0.14.7(vue@3.4.21)
+      vue-demi: 0.14.10(vue@3.4.21)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -2011,7 +2014,7 @@ packages:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@3.4.21)
-      vue-demi: 0.14.7(vue@3.4.21)
+      vue-demi: 0.14.10(vue@3.4.21)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -2048,7 +2051,7 @@ packages:
   /@vueuse/shared@10.9.0(vue@3.4.21):
     resolution: {integrity: sha512-Uud2IWncmAfJvRaFYzv5OHDli+FbOzxiVEQdLCKQKLyhz94PIyFC3CHcH7EDMwIn8NPtD06+PNbC/PiO0LGLtw==}
     dependencies:
-      vue-demi: 0.14.7(vue@3.4.21)
+      vue-demi: 0.14.10(vue@3.4.21)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -2057,7 +2060,7 @@ packages:
   /@vueuse/shared@9.13.0(vue@3.4.21):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.14.7(vue@3.4.21)
+      vue-demi: 0.14.10(vue@3.4.21)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -4655,7 +4658,7 @@ packages:
       '@vue/devtools-api': 6.6.1
       typescript: 5.4.3
       vue: 3.4.21(typescript@5.4.3)
-      vue-demi: 0.14.7(vue@3.4.21)
+      vue-demi: 0.14.10(vue@3.4.21)
     dev: false
 
   /pinyin-pro@3.19.6:
@@ -6436,8 +6439,8 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vue-demi@0.14.7(vue@3.4.21):
-    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
+  /vue-demi@0.14.10(vue@3.4.21):
+    resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
@@ -6449,7 +6452,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.4.21(typescript@5.4.3)
-    dev: false
 
   /vue-eslint-parser@9.4.2(eslint@8.57.0):
     resolution: {integrity: sha512-Ry9oiGmCAK91HrKMtCrKFWmSFWvYkpGglCeFAIqDdr9zdXmMMpJOmUJS7WWsW7fX81h6mwHmUZCQQ1E0PkSwYQ==}
