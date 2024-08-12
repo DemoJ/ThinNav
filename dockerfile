@@ -3,10 +3,9 @@ FROM python:3.10-slim as backend-build
 
 WORKDIR /app
 
-# 创建虚拟环境并安装依赖
+# 复制后端代码并安装依赖
 COPY backend/requirements.txt .
-RUN python -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
 
@@ -43,15 +42,6 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 # 复制并配置 FastAPI 应用
 COPY --from=backend-build /app /app
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
-
-# 安装必要的依赖
-RUN apk add --no-cache gcc musl-dev libffi-dev
-
-# 设置虚拟环境的路径
-ENV PATH="/opt/venv/bin:$PATH"
-
-# 确保 uvicorn 安装在虚拟环境中
-RUN /opt/venv/bin/pip install uvicorn
 
 # 启动 FastAPI 应用和 Nginx 服务
 CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
