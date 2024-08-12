@@ -44,12 +44,14 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 COPY --from=backend-build /app /app
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
-# 安装必要的依赖（如 uvicorn）和配置路径
-RUN apk add --no-cache \
-        gcc \
-        musl-dev \
-        libffi-dev \
-        && /opt/venv/bin/pip install uvicorn
+# 安装必要的依赖
+RUN apk add --no-cache gcc musl-dev libffi-dev
+
+# 确保虚拟环境的 pip 可以被找到
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 安装 uvicorn
+RUN pip install uvicorn
 
 # 启动 FastAPI 应用和 Nginx 服务
-CMD ["/bin/sh", "-c", "/opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
