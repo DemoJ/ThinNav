@@ -37,7 +37,7 @@ FROM python:3.10-slim
 
 # 安装 Nginx 和 supervisor
 RUN apt-get update && \
-    apt-get install -y nginx supervisor && \
+    apt-get install -y nginx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -48,10 +48,9 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 # 复制并配置 FastAPI 应用
 COPY --from=backend-build /app /app
 COPY docker/web-prod.conf /etc/nginx/nginx.conf
-COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
 # 暴露端口
 EXPOSE 8000 80
 
-# 启动 supervisor
-CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+# 启动 FastAPI 应用和 Nginx 服务
+CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
