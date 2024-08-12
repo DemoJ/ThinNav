@@ -49,6 +49,9 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 COPY --from=backend-build /app /app
 COPY docker/web-prod.conf /etc/nginx/nginx.conf
 
+# 安装 Uvicorn
+RUN pip install uvicorn
+
 # 暴露端口
 EXPOSE 8000 80
 
