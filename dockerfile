@@ -47,7 +47,7 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 
 # 复制并配置 FastAPI 应用
 COPY --from=backend-build /app /app
-COPY docker/web-prod.conf /etc/nginx/nginx.conf
+COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
 # 安装 Uvicorn
 RUN pip install uvicorn
