@@ -32,8 +32,14 @@ RUN pnpm install --frozen-lockfile
 COPY frontend/nav-admin/ .
 RUN pnpm build
 
-# 第四步：构建最终的 Nginx 镜像
-FROM nginx:stable-alpine
+# 第四步：构建最终的 Python + Nginx 镜像
+FROM python:3.10-slim
+
+# 安装 Nginx 和 supervisor
+RUN apt-get update && \
+    apt-get install -y nginx supervisor && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # 复制前端构建的文件
 COPY --from=frontend-user-build /app/dist /usr/share/nginx/html/user
@@ -41,7 +47,11 @@ COPY --from=frontend-admin-build /app/dist /usr/share/nginx/html/admin
 
 # 复制并配置 FastAPI 应用
 COPY --from=backend-build /app /app
-COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
+COPY docker/web-prod.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
-# 启动 FastAPI 应用和 Nginx 服务
-CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
+# 暴露端口
+EXPOSE 8000 80
+
+# 启动 supervisor
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
