@@ -26,7 +26,7 @@ WORKDIR /app
 RUN corepack enable
 RUN corepack prepare pnpm@8.6.10 --activate
 
-COPY frontend/nav-admin/package*.json ./
+COPY frontend/nav-admin/package.json frontend/nav-admin/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY frontend/nav-admin/ .
