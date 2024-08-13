@@ -1,5 +1,6 @@
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
+import creatforms, { type creatFormProps } from "./creatWebForm.vue";
 import forms, { type FormProps } from "./webForm.vue";
 import { updateWeb, delWeb, creatWeb } from "@/api/website";
 
@@ -7,13 +8,11 @@ export function handleCreat() {
   addDialog({
     width: "30%",
     title: "新建网址",
-    contentRenderer: () => forms,
+    contentRenderer: () => creatforms,
     props: {
       // 赋默认值
       formInline: {
         name: "",
-        icon: "",
-        description: "",
         order: "",
         url: "",
         category_id: ""
@@ -21,7 +20,7 @@ export function handleCreat() {
     },
     closeCallBack: async ({ options, index, args }) => {
       console.log(options, index, args);
-      const { formInline } = options.props as FormProps;
+      const { formInline } = options.props as creatFormProps;
       let text = "";
       if (args?.command === "cancel") {
         text = "您点击了取消按钮";
@@ -29,8 +28,6 @@ export function handleCreat() {
       } else if (args?.command === "sure") {
         const creatData = {
           name: formInline.name,
-          icon_url: formInline.icon,
-          description: formInline.description,
           order: Number(formInline.order),
           url: formInline.url,
           category_id: Number(formInline.category_id)

@@ -6,3 +6,8 @@ uvicorn==0.29.0
 Werkzeug==3.0.1
 aiosqlite==0.20.0
 python-multipart==0.0.9
+httpx==0.24.1
+Pillow==9.3.0
+tldextract==3.4.0
+aiofiles==23.1.0
+beautifulsoup4==4.12.2
