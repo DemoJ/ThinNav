@@ -1,0 +1,32 @@
+name: Build and push Docker image
+
+on:
+  push:
+    branches: [ main ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    # env:
+    #   http_proxy: http://192.168.1.13:7890
+    #   https_proxy: http://192.168.1.13:7890
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+    # - name: Install Python
+    #   uses: http://git.diyun.site/diyun/setup-python@v4
+    #   with:
+    #     python-version: '3.10.12'
+
+    - name: Checkout code
+      uses: http://git.diyun.work/diyun/checkout@v2
+
+    - name: Build Docker image
+      uses: http://git.diyun.work/diyun/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: registry.diyun.work/ThinNav:v${{ github.run_number }}
+
