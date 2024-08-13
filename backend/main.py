@@ -6,9 +6,13 @@ from app import models
 from app.models import Admin
 from app import categories,websites,admin
 from app.database import engine,AsyncSessionLocal
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
+
+# 挂载静态文件夹
+app.mount("/icons", StaticFiles(directory="./icons"), name="icons")
 
 app.include_router(categories.router, tags=["分类接口"], prefix="/categories")
 app.include_router(websites.router, tags=["网址接口"], prefix="/websites")

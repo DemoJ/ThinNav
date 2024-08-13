@@ -9,7 +9,8 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./data:/app/db
+      - ./data/db:/app/db
+      - ./data/icons:/app/icons
     networks:
       - app-network
 
