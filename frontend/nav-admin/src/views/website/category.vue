@@ -3,7 +3,12 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import { getCategories } from "@/api/category";
 import { onMounted, ref } from "vue";
-import { handleEdit, handleDelete, handleCreat } from "./cateOperate";
+import {
+  handleEdit,
+  handleDelete,
+  handleCreat,
+  setFetchCategoriesMethod
+} from "./cateOperate";
 
 defineOptions({
   // name 作为一种规范最好必须写上并且和路由的name保持一致
@@ -11,6 +16,16 @@ defineOptions({
 });
 
 const categoryData = ref([]);
+
+const fetchCategories = async () => {
+  categoryData.value = await getCategories();
+};
+
+// 页面挂载时获取数据并设置 fetchCategories 方法
+onMounted(() => {
+  fetchCategories();
+  setFetchCategoriesMethod(fetchCategories); // 设置 fetchCategories 方法
+});
 
 const columns: TableColumnList = [
   {
@@ -30,20 +45,14 @@ const columns: TableColumnList = [
     slot: "operation"
   }
 ];
-
-// 页面挂载时执行操作
-onMounted(async () => {
-  categoryData.value = await getCategories();
-  //console.log(categoryData.value);
-});
 </script>
 
 <template>
   <el-card shadow="never">
     <div>
-      <el-button :icon="useRenderIcon(AddFill)" @click="handleCreat()"
-        >新建分类</el-button
-      >
+      <el-button :icon="useRenderIcon(AddFill)" @click="handleCreat()">
+        新建分类
+      </el-button>
     </div>
     <pure-table :data="categoryData" :columns="columns">
       <template #operation="{ row }">

@@ -55,7 +55,7 @@ export const updateCategory = async (
   }
 };
 
-export const delCategorie = async (categoryId: string) => {
+export const delCategory = async (categoryId: string) => {
   return http.request("delete", baseUrlApi(`categories/${categoryId}`));
 };
 

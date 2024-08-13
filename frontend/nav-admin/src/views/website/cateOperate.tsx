@@ -1,13 +1,18 @@
 import { message } from "@/utils/message";
 import forms, { type FormProps } from "./cateForm.vue";
-import { updateCategory, delCategorie, creatCategory } from "@/api/category";
+import { updateCategory, delCategory, creatCategory } from "@/api/category";
 import { addDialog } from "@/components/ReDialog";
+
+let fetchCategories: () => void; // 用于在外部调用
+
+export function setFetchCategoriesMethod(method: () => void) {
+  fetchCategories = method;
+}
 
 export function handleEdit(row) {
   addDialog({
     width: "30%",
     title: "编辑分类",
-
     contentRenderer: () => forms,
     props: {
       // 赋默认值
@@ -18,31 +23,22 @@ export function handleEdit(row) {
       }
     },
     closeCallBack: async ({ options, args }) => {
-      // options.props 是响应式的
       const { formInline } = options.props as FormProps;
-      const text = `名称：${formInline.name} 排序：${formInline.order}`;
-      if (args?.command === "cancel") {
-        // 您点击了取消按钮
-        message(`您点击了取消按钮，当前表单数据为 ${text}`);
-      } else if (args?.command === "sure") {
-        // 假设这里得到更新后的数据
+      if (args?.command === "sure") {
         const updatedData = {
           name: formInline.name,
           icon_url: formInline.icon,
           order: Number(formInline.order)
         };
-        console.log("Updated id:", row.id);
-        console.log("Updated data:", updatedData);
 
         const updatedCategory = await updateCategory(row.id, updatedData);
 
         if (updatedCategory) {
-          message("Category updated successfully:");
+          message("Category updated successfully");
+          if (fetchCategories) fetchCategories(); // 更新表格数据
         } else {
           message("Failed to update category");
         }
-
-        message(`您点击了确定按钮，当前表单数据为 ${text}`);
       }
     }
   });
@@ -61,14 +57,9 @@ export function handleCreat() {
         order: ""
       }
     },
-    closeCallBack: async ({ options, index, args }) => {
-      console.log(options, index, args);
+    closeCallBack: async ({ options, args }) => {
       const { formInline } = options.props as FormProps;
-      let text = "";
-      if (args?.command === "cancel") {
-        text = "您点击了取消按钮";
-        message(text);
-      } else if (args?.command === "sure") {
+      if (args?.command === "sure") {
         const creatData = {
           name: formInline.name,
           icon_url: formInline.icon,
@@ -76,9 +67,10 @@ export function handleCreat() {
         };
         const createdCategory = await creatCategory(creatData);
         if (createdCategory) {
-          message("Category creat successfully:");
+          message("Category created successfully");
+          if (fetchCategories) fetchCategories(); // 更新表格数据
         } else {
-          message("Failed to creat category");
+          message("Failed to create category");
         }
       }
     }
@@ -90,15 +82,15 @@ export function handleDelete(row) {
     width: "30%",
     title: "确认删除",
     contentRenderer: () => <p>是否确认删除</p>,
-    closeCallBack: async ({ options, index, args }) => {
-      console.log(options, index, args);
+    closeCallBack: async ({ options, args }) => {
       let text = "";
       if (args?.command === "cancel") {
         text = "您点击了取消按钮";
-        message(text);
+        console.log(text);
       } else if (args?.command === "sure") {
-        await delCategorie(row.id);
-        message("Category delete successfully");
+        await delCategory(row.id);
+        message("Category deleted successfully");
+        if (fetchCategories) fetchCategories(); // 更新表格数据
       } else {
         message("Failed to delete category");
       }

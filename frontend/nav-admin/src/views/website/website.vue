@@ -3,7 +3,12 @@ import { ref, onMounted, watch } from "vue";
 import { getWebs } from "@/api/website";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
-import { handleEdit, handleDelete, handleCreat } from "./webOperate";
+import {
+  handleEdit,
+  handleDelete,
+  handleCreat,
+  setFetchWebsMethod
+} from "./webOperate";
 
 defineOptions({
   // name 作为一种规范最好必须写上并且和路由的name保持一致
@@ -23,7 +28,10 @@ const fetchWebs = async () => {
 };
 
 // 页面挂载时获取数据
-onMounted(fetchWebs);
+onMounted(() => {
+  fetchWebs();
+  setFetchWebsMethod(fetchWebs); // 设置 fetchWebs 方法
+});
 
 // 监听分页参数变化，重新获取数据
 watch(
