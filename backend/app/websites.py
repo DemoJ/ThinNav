@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 from urllib.parse import urlparse
 import tldextract
 import io
+import os
 import aiofiles
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -42,18 +43,24 @@ async def fetch_website_description(url: str) -> str:
 
 
 async def save_icon_image(image: Image.Image, filename: str) -> str:
+    # 确保目录存在
+    ICON_DIR = "./icons"
+    if not os.path.exists(ICON_DIR):
+        os.makedirs(ICON_DIR)
+
     """保存图标图像并返回其 URL"""
     output = io.BytesIO()
     image.save(output, format="PNG")
     output.seek(0)
 
     # 保存到本地或上传到某个存储服务
-    path = f"/icons/{filename}"
+    path = f"./icons/{filename}"
     async with aiofiles.open(path, "wb") as out_file:
         await out_file.write(output.read())
 
     # 返回保存后的图标 URL
-    return f"/icons/{filename}"
+    return f"./icons/{filename}"
+
 
 def get_favicon_or_apple_touch_icon(url):
     """尝试获取网站的favicon.ico或apple-touch-icon.png的URL"""
@@ -62,7 +69,9 @@ def get_favicon_or_apple_touch_icon(url):
 
     # 检查是否存在favicon.ico
     try:
-        favicon_response = httpx.get(f"{base_url}/favicon.ico", follow_redirects=True, verify=False)
+        favicon_response = httpx.get(
+            f"{base_url}/favicon.ico", follow_redirects=True, verify=False
+        )
         if favicon_response.status_code == 200:
             return f"{base_url}/favicon.ico"
     except Exception as e:
@@ -70,14 +79,15 @@ def get_favicon_or_apple_touch_icon(url):
 
     # 检查是否存在apple-touch-icon.png
     try:
-        apple_touch_icon_response = httpx.get(f"{base_url}/apple-touch-icon.png", follow_redirects=True, verify=False)
+        apple_touch_icon_response = httpx.get(
+            f"{base_url}/apple-touch-icon.png", follow_redirects=True, verify=False
+        )
         if apple_touch_icon_response.status_code == 200:
             return f"{base_url}/apple-touch-icon.png"
     except Exception as e:
         print(f"Error fetching apple-touch-icon: {e}")
 
     return None
-
 
 
 def generate_letter_icon(url):
@@ -163,8 +173,12 @@ async def create_website(
 async def read_websites(
     db: AsyncSession = Depends(get_db),
     skip: Optional[int] = Query(None, description="Number of records to skip", ge=0),
-    limit: Optional[int] = Query(None, description="Maximum number of records to return", ge=1),
-    all_data: Optional[bool] = Query(False, description="Fetch all data without pagination")
+    limit: Optional[int] = Query(
+        None, description="Maximum number of records to return", ge=1
+    ),
+    all_data: Optional[bool] = Query(
+        False, description="Fetch all data without pagination"
+    ),
 ):
     if all_data:
         # 获取所有数据
