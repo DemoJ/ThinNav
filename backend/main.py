@@ -7,9 +7,15 @@ from app.models import Admin
 from app import categories,websites,admin
 from app.database import engine,AsyncSessionLocal
 from fastapi.staticfiles import StaticFiles
+import os
 
 
 app = FastAPI()
+
+# 确保目录存在
+TEST_ICON_DIR = "./icons"
+if not os.path.exists(TEST_ICON_DIR):
+    os.makedirs(TEST_ICON_DIR)
 
 # 挂载静态文件夹
 app.mount("/icons", StaticFiles(directory="./icons"), name="icons")

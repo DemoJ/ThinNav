@@ -3,7 +3,6 @@ from PIL import Image, ImageDraw, ImageFont
 from urllib.parse import urlparse
 import tldextract
 import io
-import os
 import aiofiles
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -44,11 +43,6 @@ async def fetch_website_description(url: str) -> str:
 
 async def save_icon_image(image: Image.Image, filename: str) -> str:
     """保存图标图像并返回其 URL"""
-    # 确保目录存在
-    TEST_ICON_DIR = "./icons"
-    if not os.path.exists(TEST_ICON_DIR):
-        os.makedirs(TEST_ICON_DIR)
-
     # 替换文件名中的非法字符
     filename = filename.replace(":", "_")
 
@@ -57,7 +51,7 @@ async def save_icon_image(image: Image.Image, filename: str) -> str:
     output.seek(0)
 
     # 异步保存到本地
-    path = f"{TEST_ICON_DIR}/{filename}"
+    path = f"./icons/{filename}"
     if not path.endswith(".png"):
         path += ".png"
 
