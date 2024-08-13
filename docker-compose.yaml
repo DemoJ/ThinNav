@@ -8,6 +8,8 @@ services:
     container_name: ThinNav
     ports:
       - "8888:8888"
+    volumes:
+      - ./data:/app/db
     networks:
       - app-network
 
