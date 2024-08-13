@@ -24,6 +24,7 @@ const submitPasswordChange = async () => {
     old_password: Infos.oldPassword,
     new_password: Infos.newPassword
   };
+
   try {
     const response = await changeUserPassword(data);
     message("密码更新成功", { type: "success" });

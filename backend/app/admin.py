@@ -47,7 +47,7 @@ async def admin_login(
     # 获取当前时间
     current_time = datetime.now()
 
-    add_expires = timedelta(minutes=1)
+    add_expires = timedelta(minutes=30)
 
     # 将当前时间加上一分钟
     minute_later = current_time + add_expires
