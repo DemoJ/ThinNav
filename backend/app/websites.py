@@ -22,7 +22,7 @@ async def fetch_website_description(url: str) -> str:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
     try:
-        async with httpx.AsyncClient(follow_redirects=True) as client:
+        async with httpx.AsyncClient(follow_redirects=True, verify=False) as client:
             response = await client.get(url, headers=headers)
             response.raise_for_status()
 
@@ -60,18 +60,23 @@ def get_favicon_or_apple_touch_icon(url):
     base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
 
     # 检查是否存在favicon.ico
-    favicon_response = httpx.get(f"{base_url}/favicon.ico", follow_redirects=True)
-    if favicon_response.status_code == 200:
-        return f"{base_url}/favicon.ico"
+    try:
+        favicon_response = httpx.get(f"{base_url}/favicon.ico", follow_redirects=True, verify=False)
+        if favicon_response.status_code == 200:
+            return f"{base_url}/favicon.ico"
+    except Exception as e:
+        print(f"Error fetching favicon: {e}")
 
     # 检查是否存在apple-touch-icon.png
-    apple_touch_icon_response = httpx.get(
-        f"{base_url}/apple-touch-icon.png", follow_redirects=True
-    )
-    if apple_touch_icon_response.status_code == 200:
-        return f"{base_url}/apple-touch-icon.png"
+    try:
+        apple_touch_icon_response = httpx.get(f"{base_url}/apple-touch-icon.png", follow_redirects=True, verify=False)
+        if apple_touch_icon_response.status_code == 200:
+            return f"{base_url}/apple-touch-icon.png"
+    except Exception as e:
+        print(f"Error fetching apple-touch-icon: {e}")
 
     return None
+
 
 
 def generate_letter_icon(url):
