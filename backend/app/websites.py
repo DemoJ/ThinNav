@@ -43,23 +43,29 @@ async def fetch_website_description(url: str) -> str:
 
 
 async def save_icon_image(image: Image.Image, filename: str) -> str:
-    # 确保目录存在
-    ICON_DIR = "./icons"
-    if not os.path.exists(ICON_DIR):
-        os.makedirs(ICON_DIR)
-
     """保存图标图像并返回其 URL"""
+    # 确保目录存在
+    TEST_ICON_DIR = "./icons"
+    if not os.path.exists(TEST_ICON_DIR):
+        os.makedirs(TEST_ICON_DIR)
+
+    # 替换文件名中的非法字符
+    filename = filename.replace(":", "_")
+
     output = io.BytesIO()
     image.save(output, format="PNG")
     output.seek(0)
 
-    # 保存到本地或上传到某个存储服务
-    path = f"./icons/{filename}"
+    # 异步保存到本地
+    path = f"{TEST_ICON_DIR}/{filename}"
+    if not path.endswith(".png"):
+        path += ".png"
+
     async with aiofiles.open(path, "wb") as out_file:
         await out_file.write(output.read())
 
     # 返回保存后的图标 URL
-    return f"./icons/{filename}"
+    return path
 
 
 def get_favicon_or_apple_touch_icon(url):
@@ -91,17 +97,30 @@ def get_favicon_or_apple_touch_icon(url):
 
 
 def generate_letter_icon(url):
-    """使用网站首字母生成图标"""
+    """使用网站二级域名的首字母或IP地址的首字母生成图标"""
     extracted = tldextract.extract(url)
     domain = extracted.domain
-    letter = domain[0].upper()
+
+    # 判断是否为IP地址
+    parsed_url = urlparse(url)
+    if parsed_url.hostname.replace(".", "").isdigit():
+        # 使用IP地址的首字母
+        letter = parsed_url.hostname[0].upper()
+    else:
+        # 使用二级域名的首字母
+        letter = domain[0].upper() if domain else "U"  # 若无效域名则用'U'
 
     # 创建一个空白图像
     img_size = (64, 64)
     image = Image.new("RGB", img_size, color=(73, 109, 137))
 
     # 选择字体和字号
-    font = ImageFont.truetype("arial.ttf", 36)
+    font_path = "arial.ttf"  # 或者使用绝对路径
+    try:
+        font = ImageFont.truetype(font_path, 36)
+    except IOError:
+        font = ImageFont.load_default()  # 加载默认字体
+
     draw = ImageDraw.Draw(image)
 
     # 计算文字位置以居中显示
