@@ -12,6 +12,7 @@ from sqlalchemy.future import select
 from . import models, schemas
 from .database import get_db
 from .auth import get_current_user
+from typing import Optional
 
 router = APIRouter()
 
@@ -161,44 +162,77 @@ async def create_website(
 @router.get("/", response_model=schemas.PaginatedWebsites)
 async def read_websites(
     db: AsyncSession = Depends(get_db),
-    skip: int = Query(0, description="Number of records to skip", ge=0),
-    limit: int = Query(10, description="Maximum number of records to return", ge=1),
+    skip: Optional[int] = Query(None, description="Number of records to skip", ge=0),
+    limit: Optional[int] = Query(None, description="Maximum number of records to return", ge=1),
+    all_data: Optional[bool] = Query(False, description="Fetch all data without pagination")
 ):
-    # 获取总记录数
-    total = await db.scalar(select(func.count()).select_from(models.Website))
-
-    # 获取分页数据，按照 order 字段排序
-    stmt = (
-        select(models.Website, models.Category.name.label("category_name"))
-        .join(
-            models.Category,
-            models.Website.category_id == models.Category.id,
-            isouter=True,
+    if all_data:
+        # 获取所有数据
+        stmt = (
+            select(models.Website, models.Category.name.label("category_name"))
+            .join(
+                models.Category,
+                models.Website.category_id == models.Category.id,
+                isouter=True,
+            )
+            .order_by(models.Website.order)  # 按 order 字段排序
         )
-        .order_by(models.Website.order)  # 按 order 字段排序
-        .offset(skip)
-        .limit(limit)
-    )
-    result = await db.execute(stmt)
-    websites = result.all()
+        result = await db.execute(stmt)
+        websites = result.all()
 
-    # 处理结果
-    response_data = [
-        schemas.Website(
-            id=website.id,
-            name=website.name,
-            icon_url=website.icon_url,
-            description=website.description,
-            order=website.order,
-            url=website.url,
-            category_id=website.category_id,
-            category_name=category_name,
+        # 处理结果
+        response_data = [
+            schemas.Website(
+                id=website.id,
+                name=website.name,
+                icon_url=website.icon_url,
+                description=website.description,
+                order=website.order,
+                url=website.url,
+                category_id=website.category_id,
+                category_name=category_name,
+            )
+            for website, category_name in websites
+        ]
+
+        # 返回所有数据和总记录数
+        total = len(response_data)  # 总记录数是返回数据的长度
+        return schemas.PaginatedWebsites(data=response_data, total=total)
+    else:
+        # 分页数据
+        total = await db.scalar(select(func.count()).select_from(models.Website))
+
+        stmt = (
+            select(models.Website, models.Category.name.label("category_name"))
+            .join(
+                models.Category,
+                models.Website.category_id == models.Category.id,
+                isouter=True,
+            )
+            .order_by(models.Website.order)  # 按 order 字段排序
+            .offset(skip or 0)
+            .limit(limit or 10)
         )
-        for website, category_name in websites
-    ]
+        result = await db.execute(stmt)
+        websites = result.all()
 
-    # 返回分页数据和总记录数
-    return schemas.PaginatedWebsites(data=response_data, total=total)
+        # 处理结果
+        response_data = [
+            schemas.Website(
+                id=website.id,
+                name=website.name,
+                icon_url=website.icon_url,
+                description=website.description,
+                order=website.order,
+                url=website.url,
+                category_id=website.category_id,
+                category_name=category_name,
+            )
+            for website, category_name in websites
+        ]
+
+        # 返回分页数据和总记录数
+        return schemas.PaginatedWebsites(data=response_data, total=total)
 
 
 @router.put("/{website_id}", response_model=schemas.Website)

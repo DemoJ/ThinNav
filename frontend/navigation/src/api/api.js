@@ -11,7 +11,7 @@ const apiClient = axios.create({
 // 获取所有网址信息
 export const getWebsites = async () => {
   try {
-    const response = await apiClient.get("/websites/");
+    const response = await apiClient.get("/websites/?all_data=true");
     // 确保响应格式符合预期
     if (response.data && response.data.data) {
       return response.data; // 返回完整的响应数据
