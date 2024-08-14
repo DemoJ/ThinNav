@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { getCategories, CategoryResult } from "@/api/category";
+import { uploadIcon, getIconUrl } from "@/api/icon";
 
 // 声明 props 类型
 export interface FormProps {
@@ -12,12 +13,10 @@ export interface FormProps {
     icon: string;
     order: number;
     category_id: string;
-
   };
 }
 
 // 声明 props 默认值
-// 推荐阅读：https://cn.vuejs.org/guide/typescript/composition-api.html#typing-component-props
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     name: "",
@@ -29,11 +28,6 @@ const props = withDefaults(defineProps<FormProps>(), {
   })
 });
 
-// vue 规定所有的 prop 都遵循着单向绑定原则，直接修改 prop 时，Vue 会抛出警告。此处的写法仅仅是为了消除警告。
-// 因为对一个 reactive 对象执行 ref，返回 Ref 对象的 value 值仍为传入的 reactive 对象，
-// 即 newFormInline === props.formInline 为 true，所以此处代码的实际效果，仍是直接修改 props.formInline。
-// 但该写法仅适用于 props.formInline 是一个对象类型的情况，原始类型需抛出事件
-// 推荐阅读：https://cn.vuejs.org/guide/components/props.html#one-way-data-flow
 const newFormInline = ref(props.formInline);
 
 // 存储分类数据
@@ -53,6 +47,36 @@ onMounted(() => {
 const handleCategoryChange = (value: string) => {
   newFormInline.value.category_id = value;
 };
+
+// 获取URL地址对应的图标
+const fetchIconFromUrl = async () => {
+  // 假设有一个接口可以获取图标地址
+  try {
+    const iconUrl = await getIconUrl(newFormInline.value.url);
+    newFormInline.value.icon = iconUrl.icon_url;
+  } catch (error) {
+    console.error("获取图标失败:", error);
+  }
+};
+
+// 处理图标上传
+const handleIconUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // 调用上传图标的 API
+      const response = await uploadIcon(formData);
+      console.log("上传图标成功:", response.icon_url);
+      newFormInline.value.icon = response.icon_url; // 仅更新本地状态中的图标 URL
+    } catch (error) {
+      console.error("上传图标失败:", error);
+    }
+  }
+};
 </script>
 
 <template>
@@ -60,43 +84,60 @@ const handleCategoryChange = (value: string) => {
     <el-form-item label="名称">
       <el-input
         v-model="newFormInline.name"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入网站名称"
       />
     </el-form-item>
-    <el-form-item label="图标">
+    <el-form-item label="URL">
       <el-input
-        v-model="newFormInline.icon"
-        class="!w-[220px]"
-        placeholder="请输入网站图标"
+        v-model="newFormInline.url"
+        class="!w-[300px]"
+        placeholder="请输入网站url"
       />
+    </el-form-item>
+    <el-form-item label="图标">
+      <div class="flex items-center space-x-4">
+        <img
+          :src="newFormInline.icon || 'default-icon.png'"
+          alt="icon"
+          class="w-12 h-12"
+        />
+        <el-button type="primary" size="small" @click="fetchIconFromUrl">
+          获取图标
+        </el-button>
+        <el-button size="small" class="relative overflow-hidden">
+          上传图标
+          <input
+            type="file"
+            accept="image/*"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            @change="handleIconUpload"
+          />
+        </el-button>
+      </div>
     </el-form-item>
     <el-form-item label="排序">
       <el-input
         v-model="newFormInline.order"
         type="number"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入网站排序"
       />
     </el-form-item>
     <el-form-item label="描述">
       <el-input
         v-model="newFormInline.description"
-        class="!w-[220px]"
+        type="textarea"
+        class="!w-[300px]"
         placeholder="请输入网站描述"
+        rows="4"
       />
     </el-form-item>
-    <el-form-item label="URL">
-      <el-input
-        v-model="newFormInline.url"
-        class="!w-[220px]"
-        placeholder="请输入网站url"
-      />
-    </el-form-item>
+
     <el-form-item label="分类">
       <el-select
         v-model="newFormInline.category_id"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请选择分类"
         @change="handleCategoryChange"
       >

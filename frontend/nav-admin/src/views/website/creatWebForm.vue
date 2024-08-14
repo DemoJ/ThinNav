@@ -56,7 +56,7 @@ const handleCategoryChange = (value: string) => {
     <el-form-item label="名称">
       <el-input
         v-model="newFormInline.name"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入网站名称"
       />
     </el-form-item>
@@ -64,21 +64,21 @@ const handleCategoryChange = (value: string) => {
       <el-input
         v-model="newFormInline.order"
         type="number"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入网站排序"
       />
     </el-form-item>
     <el-form-item label="URL">
       <el-input
         v-model="newFormInline.url"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入网站url"
       />
     </el-form-item>
     <el-form-item label="分类">
       <el-select
         v-model="newFormInline.category_id"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请选择分类"
         @change="handleCategoryChange"
       >
