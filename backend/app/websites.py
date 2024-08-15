@@ -1,5 +1,5 @@
 import httpx
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from urllib.parse import urlparse
 import tldextract
 import io
@@ -91,7 +91,7 @@ def get_favicon_or_apple_touch_icon(url):
 
 
 def generate_letter_icon(url):
-    """使用网站二级域名的首字母或IP地址的首字母生成图标"""
+    """使用网站二级域名的首字母或IP地址的首字母生成圆形图标"""
     extracted = tldextract.extract(url)
     domain = extracted.domain
 
@@ -108,19 +108,33 @@ def generate_letter_icon(url):
     img_size = (64, 64)
     image = Image.new("RGB", img_size, color=(73, 109, 137))
 
+    # 创建一个圆形蒙版
+    mask = Image.new("L", img_size, 0)
+    draw_mask = ImageDraw.Draw(mask)
+    draw_mask.ellipse((0, 0) + img_size, fill=255)
+
+    # 应用蒙版以生成圆形图像
+    image = ImageOps.fit(image, img_size, centering=(0.5, 0.5))
+    image.putalpha(mask)
+
     # 选择字体和字号
     font_path = "arial.ttf"  # 或者使用绝对路径
     try:
-        font = ImageFont.truetype(font_path, 36)
+        font = ImageFont.truetype(font_path, 48)  # 增大字体
     except IOError:
         font = ImageFont.load_default()  # 加载默认字体
 
     draw = ImageDraw.Draw(image)
 
-    # 计算文字位置以居中显示
+    # 计算文字边界框
     bbox = draw.textbbox((0, 0), letter, font=font)
     text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    position = ((img_size[0] - text_width) / 2, (img_size[1] - text_height) / 2)
+
+    # 垂直居中调整
+    position = (
+        (img_size[0] - text_width) / 2,
+        (img_size[1] - text_height) / 2 - (bbox[1] / 2),
+    )
 
     # 绘制文字
     draw.text(position, letter, (255, 255, 255), font=font)
