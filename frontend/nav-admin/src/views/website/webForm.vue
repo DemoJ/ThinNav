@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { getCategories, CategoryResult } from "@/api/category";
 import { uploadIcon, getIconUrl } from "@/api/icon";
 
@@ -77,6 +77,15 @@ const handleIconUpload = async (event: Event) => {
     }
   }
 };
+
+const VITE_PUBLIC_PATH = import.meta.env.VITE_PUBLIC_PATH || "/";
+
+const processRelativePath = (path: string) => {
+  if (path.startsWith("./")) {
+    return `/api${VITE_PUBLIC_PATH}${path.slice(2)}`;
+  }
+  return path;
+};
 </script>
 
 <template>
@@ -98,7 +107,7 @@ const handleIconUpload = async (event: Event) => {
     <el-form-item label="图标">
       <div class="flex items-center space-x-4">
         <img
-          :src="newFormInline.icon || 'default-icon.png'"
+          :src="processRelativePath(newFormInline.icon)"
           alt="icon"
           class="w-12 h-12"
         />
