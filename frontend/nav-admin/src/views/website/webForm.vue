@@ -82,7 +82,8 @@ const VITE_PUBLIC_PATH = import.meta.env.VITE_PUBLIC_PATH || "/";
 
 const processRelativePath = (path: string) => {
   if (path.startsWith("./")) {
-    return `/api${VITE_PUBLIC_PATH}${path.slice(2)}`;
+    const basePath = import.meta.env.PROD ? "/" : VITE_PUBLIC_PATH;
+    return `/api${basePath}${path.slice(2)}`;
   }
   return path;
 };
