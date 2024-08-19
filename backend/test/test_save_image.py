@@ -51,8 +51,9 @@ def generate_letter_icon(url):
 
     # 选择字体和字号
     font_path = "arial.ttf"  # 或者使用绝对路径
+    font_size = int(img_size[0] * 0.8)  # 80% of image width
     try:
-        font = ImageFont.truetype(font_path, 48)  # 增大字体
+        font = ImageFont.truetype(font_path, font_size)  # 增大字体
     except IOError:
         font = ImageFont.load_default()  # 加载默认字体
 
@@ -74,7 +75,7 @@ def generate_letter_icon(url):
     return image
 
 
-url = "http://a.b.c.com:9999"
+url = "https://www.pdf2docx.cn/"
 default_icon = generate_letter_icon(url)
 
 # 使用 netloc 作为文件名，并替换掉 : 号

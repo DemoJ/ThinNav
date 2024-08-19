@@ -65,7 +65,6 @@ html, body, #app {
 
 html, body {
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 #app {

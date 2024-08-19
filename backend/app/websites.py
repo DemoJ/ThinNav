@@ -62,32 +62,35 @@ async def save_icon_image(image: Image.Image, filename: str) -> str:
     return path
 
 
-def get_favicon_or_apple_touch_icon(url):
-    """尝试获取网站的favicon.ico或apple-touch-icon.png的URL"""
-    parsed_url = urlparse(url)
-    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-
-    # 检查是否存在favicon.ico
+async def get_icon(url):
+    """尝试获取网站图标的URL"""
     try:
-        favicon_response = httpx.get(
-            f"{base_url}/favicon.ico", follow_redirects=True, verify=False
-        )
-        if favicon_response.status_code == 200:
-            return f"{base_url}/favicon.ico"
-    except Exception as e:
-        print(f"Error fetching favicon: {e}")
+        # 获取网页内容
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            response = await client.get(url, verify=False)
+            response.raise_for_status()  # 确保请求成功
 
-    # 检查是否存在apple-touch-icon.png
-    try:
-        apple_touch_icon_response = httpx.get(
-            f"{base_url}/apple-touch-icon.png", follow_redirects=True, verify=False
-        )
-        if apple_touch_icon_response.status_code == 200:
-            return f"{base_url}/apple-touch-icon.png"
-    except Exception as e:
-        print(f"Error fetching apple-touch-icon: {e}")
+        # 解析 HTML
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    return None
+        # 查找图标链接
+        link = soup.find("link", rel="icon") or soup.find("link", rel="shortcut icon")
+        if link and link.get("href"):
+            icon_url = link["href"]
+
+            # 如果图标 URL 是相对路径，转换为绝对路径
+            if not icon_url.startswith(("http://", "https://")):
+                from urllib.parse import urljoin
+
+                icon_url = urljoin(url, icon_url)
+
+            return {"icon_url": icon_url}
+        else:
+            raise HTTPException(status_code=404, detail="Icon not found")
+
+    except Exception as e:
+        print(f"Error fetching icon: {e}")
+        return None
 
 
 def generate_letter_icon(url):
@@ -119,8 +122,9 @@ def generate_letter_icon(url):
 
     # 选择字体和字号
     font_path = "arial.ttf"  # 或者使用绝对路径
+    font_size = int(img_size[0] * 0.8)  # 80% of image width
     try:
-        font = ImageFont.truetype(font_path, 48)  # 增大字体
+        font = ImageFont.truetype(font_path, font_size)
     except IOError:
         font = ImageFont.load_default()  # 加载默认字体
 
@@ -151,7 +155,7 @@ async def create_website(
     url = website.url
 
     # 尝试获取图标的 URL
-    icon_url = get_favicon_or_apple_touch_icon(url)
+    icon_url = await get_icon(url)
 
     if not icon_url:
         # 如果图标不存在，则生成一个默认图标并保存

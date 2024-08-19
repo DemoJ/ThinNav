@@ -11,7 +11,6 @@ import {
 } from "./webOperate";
 
 defineOptions({
-  // name 作为一种规范最好必须写上并且和路由的name保持一致
   name: "Website"
 });
 
@@ -20,32 +19,30 @@ const pagination = ref({ current: 1, pageSize: 10, total: 0 });
 
 const fetchWebs = async () => {
   const { data, total } = await getWebs({
-    page: pagination.value.current || 1, // 确保 page 为有效数字
-    limit: pagination.value.pageSize || 10 // 确保 limit 为有效数字
+    page: pagination.value.current || 1,
+    limit: pagination.value.pageSize || 10
   });
   webData.value = data;
   pagination.value.total = total;
 };
 
-// 页面挂载时获取数据
 onMounted(() => {
   fetchWebs();
-  setFetchWebsMethod(fetchWebs); // 设置 fetchWebs 方法
+  setFetchWebsMethod(fetchWebs);
 });
 
-// 监听分页参数变化，重新获取数据
 watch(
   [() => pagination.value.current, () => pagination.value.pageSize],
   fetchWebs
 );
 
 const onPageSizeChange = (size: number) => {
-  pagination.value.pageSize = size || 10; // 默认为10
+  pagination.value.pageSize = size || 10;
   pagination.value.current = 1;
 };
 
 const onCurrentChange = (current: number) => {
-  pagination.value.current = current || 1; // 默认为1
+  pagination.value.current = current || 1;
 };
 
 const columns: TableColumnList = [
@@ -59,7 +56,8 @@ const columns: TableColumnList = [
   },
   {
     label: "描述",
-    prop: "description"
+    prop: "description",
+    showOverflowTooltip: true // 启用文字溢出省略号和 tooltip 显示
   },
   {
     label: "分类",
