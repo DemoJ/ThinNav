@@ -4,7 +4,6 @@ import os
 import tldextract
 from urllib.parse import urlparse
 
-
 def save_icon_image(image: Image.Image, filename: str) -> str:
     # 确保目录存在
     TEST_ICON_DIR = "./icons"
@@ -20,7 +19,6 @@ def save_icon_image(image: Image.Image, filename: str) -> str:
 
     # 返回保存后的图标 URL
     return path
-
 
 def generate_letter_icon(url):
     """使用网站二级域名的首字母或IP地址的首字母生成圆形图标"""
@@ -50,10 +48,9 @@ def generate_letter_icon(url):
     image.putalpha(mask)
 
     # 选择字体和字号
-    font_path = "arial.ttf"  # 或者使用绝对路径
-    font_size = int(img_size[0] * 0.8)  # 80% of image width
+    font_path = "./fonts/Roboto-Regular.ttf"  # 使用相对路径指向Roboto字体文件
     try:
-        font = ImageFont.truetype(font_path, font_size)  # 增大字体
+        font = ImageFont.truetype(font_path, 48)
     except IOError:
         font = ImageFont.load_default()  # 加载默认字体
 
@@ -73,7 +70,6 @@ def generate_letter_icon(url):
     draw.text(position, letter, (255, 255, 255), font=font)
 
     return image
-
 
 url = "https://www.pdf2docx.cn/"
 default_icon = generate_letter_icon(url)

@@ -121,10 +121,9 @@ def generate_letter_icon(url):
     image.putalpha(mask)
 
     # 选择字体和字号
-    font_path = "arial.ttf"  # 或者使用绝对路径
-    font_size = int(img_size[0] * 0.8)  # 80% of image width
+    font_path = "./fonts/Roboto-Regular.ttf"  # 使用相对路径指向Roboto字体文件
     try:
-        font = ImageFont.truetype(font_path, font_size)
+        font = ImageFont.truetype(font_path, 48)
     except IOError:
         font = ImageFont.load_default()  # 加载默认字体
 
