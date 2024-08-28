@@ -74,7 +74,7 @@ const submitPasswordChange = async () => {
   </el-card>
 </template>
 
-<style>
+<style scoped>
 .el-form-item {
   width: 40%;
 }

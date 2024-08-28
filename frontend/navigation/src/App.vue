@@ -32,24 +32,30 @@ export default {
         getWebsites()
       ]);
 
-      // 确保从响应数据中提取正确的数据
       const categories = categoriesResponse; // 从 getCategories 中直接获取数据
       const websites = websitesResponse.data; // 从 getWebsites 中提取 data 字段
       console.log(websites);
 
-
-      // 确保 websites 是数组
       if (!Array.isArray(websites)) {
         throw new Error('Websites data is not an array');
       }
 
-      // 对分类和网址进行排序并组合
-      this.categories = categories.map(category => ({
-        ...category,
-        websites: websites
-          .filter(website => website.category_id === category.id)
-          .sort((a, b) => a.order - b.order) // 按网址 order 排序
-      })).sort((a, b) => a.order - b.order); // 按分类 order 排序
+      // 对分类和网址进行排序、过滤和组合
+      this.categories = categories
+        .map(category => {
+          const filteredWebsites = websites
+            .filter(website => website.category_id === category.id)
+            .sort((a, b) => a.order - b.order); // 按网址 order 排序
+
+          // 仅返回包含网址的分类
+          return filteredWebsites.length > 0 ? {
+            ...category,
+            websites: filteredWebsites
+          } : null;
+        })
+        .filter(category => category !== null) // 过滤掉没有网址的分类
+        .sort((a, b) => a.order - b.order); // 按分类 order 排序
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
