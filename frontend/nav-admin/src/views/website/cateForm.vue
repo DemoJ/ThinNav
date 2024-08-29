@@ -30,22 +30,32 @@ const newFormInline = ref(props.formInline);
     <el-form-item label="名称">
       <el-input
         v-model="newFormInline.name"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入分类名称"
       />
     </el-form-item>
     <el-form-item label="图标">
       <el-input
         v-model="newFormInline.icon"
-        class="!w-[220px]"
-        placeholder="请输入图标"
+        class="!w-[300px]"
+        placeholder="请输入fontawesome图标名称"
       />
+      <div style="margin-top: 5px; font-size: 12px; color: #888">
+        仅支持免费库中 Solid 风格图标，
+        <a
+          href="https://fontawesome.com/search?o=r&m=free&s=solid"
+          target="_blank"
+          style="color: #409eff"
+        >
+          参考此页面
+        </a>
+      </div>
     </el-form-item>
     <el-form-item label="排序">
       <el-input
         v-model="newFormInline.order"
         type="number"
-        class="!w-[220px]"
+        class="!w-[300px]"
         placeholder="请输入分类排序"
       />
     </el-form-item>
