@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import { debounce } from "lodash-es"; // 引入 debounce 函数
 import { getWebs } from "@/api/website";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AddFill from "@iconify-icons/ri/add-circle-line";
+import SearchIcon from "@iconify-icons/ri/search-line"; // 引入搜索图标
 import {
   handleEdit,
   handleDelete,
@@ -16,15 +18,18 @@ defineOptions({
 
 const webData = ref([]);
 const pagination = ref({ current: 1, pageSize: 10, total: 0 });
+const searchKeyword = ref("");
 
-const fetchWebs = async () => {
+// 使用 debounce 优化搜索，延迟触发 API 请求
+const fetchWebs = debounce(async (keyword = "") => {
   const { data, total } = await getWebs({
     page: pagination.value.current || 1,
-    limit: pagination.value.pageSize || 10
+    limit: pagination.value.pageSize || 10,
+    search: keyword
   });
   webData.value = data;
   pagination.value.total = total;
-};
+}, 300);
 
 onMounted(() => {
   fetchWebs();
@@ -32,8 +37,12 @@ onMounted(() => {
 });
 
 watch(
-  [() => pagination.value.current, () => pagination.value.pageSize],
-  fetchWebs
+  [
+    () => pagination.value.current,
+    () => pagination.value.pageSize,
+    searchKeyword
+  ],
+  ([, , keyword]) => fetchWebs(keyword)
 );
 
 const onPageSizeChange = (size: number) => {
@@ -71,14 +80,23 @@ const columns: TableColumnList = [
 </script>
 
 <template>
-  <!-- TODO 给表格添加搜索功能 -->
   <el-card shadow="never">
-    <div>
+    <div
+      style="display: flex; align-items: center; justify-content: space-between"
+    >
       <el-button :icon="useRenderIcon(AddFill)" @click="handleCreat()">
         新建网址
       </el-button>
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索网址"
+        style="width: 300px"
+        clearable
+        :prefix-icon="useRenderIcon(SearchIcon)"
+      />
     </div>
-    <pure-table :data="webData" :columns="columns">
+    <pure-table :data="webData" :columns="columns" class="mt-4">
+      <!-- 添加上间距 -->
       <template #operation="{ row }">
         <el-button size="small" @click="handleEdit(row)"> 编辑 </el-button>
         <el-button size="small" type="danger" @click="handleDelete(row)">

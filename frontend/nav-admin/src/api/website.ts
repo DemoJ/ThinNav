@@ -26,10 +26,12 @@ interface webData {
 
 export const getWebs = async ({
   page = 1,
-  limit = 10
+  limit = 10,
+  search = "" // 新增：搜索关键字参数
 }: {
   page: number;
   limit: number;
+  search?: string; // 搜索关键字为可选参数
 }) => {
   try {
     const data = await http.request<{ data: webResult[]; total: number }>(
@@ -38,7 +40,8 @@ export const getWebs = async ({
       {
         params: {
           skip: (page - 1) * limit, // 计算跳过的条数
-          limit: limit
+          limit: limit,
+          search: search || undefined // 如果有搜索关键字，则添加到请求参数中
         }
       }
     );

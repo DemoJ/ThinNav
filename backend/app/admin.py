@@ -4,17 +4,18 @@ from sqlalchemy.future import select
 from .models import Admin
 from .schemas import ChangePasswordRequest
 from .database import get_db
-from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from .auth import create_tokens, get_current_user, refresh_token
-from datetime import timedelta,datetime
+from datetime import timedelta, datetime
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
+
 @router.post("/token")
 async def login_for_access_token(
-form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     admin = await db.execute(select(Admin).where(Admin.username == form_data.username))
     admin = admin.scalars().first()
@@ -27,10 +28,11 @@ form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get
 
     add_expires = timedelta(minutes=1)
 
-    accessToken= create_tokens(
+    accessToken = create_tokens(
         data={"sub": admin.username}, expires_delta=add_expires
     )[0]
     return {"access_token": accessToken, "token_type": "bearer"}
+
 
 @router.post("/login")
 async def admin_login(
@@ -53,7 +55,7 @@ async def admin_login(
     minute_later = current_time + add_expires
 
     # 转换为时间戳
-    accessToken_expires = int(minute_later.timestamp()* 1000)
+    accessToken_expires = int(minute_later.timestamp() * 1000)
 
     accessToken, refreshToken = create_tokens(
         data={"sub": admin.username}, expires_delta=add_expires
@@ -70,23 +72,35 @@ async def admin_login(
             "roles": ["admin"],
             "accessToken": accessToken,
             "refreshToken": refreshToken,
-            "expires": accessToken_expires
+            "expires": accessToken_expires,
         },
     }
 
 
 @router.post("/refresh-token")
-async def refresh_access_token(refreshToken: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+async def refresh_access_token(
+    refreshToken: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+):
     try:
         print(refreshToken)
         token_data = await refresh_token(refreshToken, db)
+        # 获取当前时间
+        current_time = datetime.now()
+
+        add_expires = timedelta(minutes=30)
+
+        # 将当前时间加上一分钟
+        minute_later = current_time + add_expires
+
+        # 转换为时间戳
+        accessToken_expires = int(minute_later.timestamp() * 1000)
         return {
             "success": 1,
             "data": {
-                "accessToken": token_data['accessToken'],
-                "refreshToken": token_data['refreshToken'],
-                "token_type": "bearer"
-            }
+                "accessToken": token_data["accessToken"],
+                "refreshToken": token_data["refreshToken"],
+                "expires": accessToken_expires,
+            },
         }
     except HTTPException as e:
         raise e

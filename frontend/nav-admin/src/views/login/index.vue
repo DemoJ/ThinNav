@@ -22,7 +22,6 @@ import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
 import { getLogin } from "@/api/login";
 
-
 defineOptions({
   name: "Login"
 });
@@ -79,7 +78,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         message("登录成功", { type: "success" });
       } catch (error) {
         // 从响应中提取更多的错误信息
-        const errorMsg = error.response?.data?.detail || '网络错误';
+        const errorMsg = error.response?.data?.detail || "网络错误";
         if (error.response?.status === 401) {
           message("登录失败: 用户名或密码错误", { type: "error" });
         } else {
@@ -121,7 +120,8 @@ onBeforeUnmount(() => {
         inline-prompt
         :active-icon="dayIcon"
         :inactive-icon="darkIcon"
-        @change="dataThemeChange" />
+        @change="dataThemeChange"
+      />
     </div>
     <div class="login-container">
       <div class="img">
@@ -141,7 +141,8 @@ onBeforeUnmount(() => {
             size="large"
           >
             <Motion :delay="100">
-              <el-form-item :rules="[
+              <el-form-item
+                :rules="[
                   {
                     required: true,
                     message: '请输入账号',
@@ -166,7 +167,8 @@ onBeforeUnmount(() => {
                   clearable
                   show-password
                   placeholder="密码"
-                  :prefix-icon="useRenderIcon(Lock)" />
+                  :prefix-icon="useRenderIcon(Lock)"
+                />
               </el-form-item>
             </Motion>
 
@@ -176,7 +178,8 @@ onBeforeUnmount(() => {
                 size="default"
                 type="primary"
                 :loading="loading"
-                @click="onLogin(ruleFormRef)">
+                @click="onLogin(ruleFormRef)"
+              >
                 登录
               </el-button>
             </Motion>
