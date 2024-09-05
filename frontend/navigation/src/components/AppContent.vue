@@ -12,7 +12,7 @@
     </div>
     <div class="footer">
       <a href="https://github.com/DemoJ/ThinNav" target="_blank" class="footer-link">
-        <i class="fab fa-github"></i> Created by diyun
+        <i class="fab fa-github"></i> Created by Diyun and ChatGPT
       </a>
     </div>
   </div>

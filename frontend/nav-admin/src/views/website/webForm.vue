@@ -102,7 +102,7 @@ const processRelativePath = (path: string) => {
       <el-input
         v-model="newFormInline.url"
         class="!w-[300px]"
-        placeholder="请输入网站url"
+        placeholder="请输入网站url，包含“http(s)://”"
       />
     </el-form-item>
     <el-form-item label="图标">
