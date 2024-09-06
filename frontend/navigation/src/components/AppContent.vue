@@ -4,14 +4,22 @@
       <div v-for="category in categories" :key="category.id" class="category">
         <p :id="category.name" class="category-name">{{ category.name }}</p>
         <div class="card-container">
-          <div v-for="website in category.websites" :key="website.id" class="card">
+          <div
+            v-for="website in category.websites"
+            :key="website.id"
+            class="card"
+          >
             <WebsiteCard :link="website" />
           </div>
         </div>
       </div>
     </div>
     <div class="footer">
-      <a href="https://github.com/DemoJ/ThinNav" target="_blank" class="footer-link">
+      <a
+        href="https://github.com/DemoJ/ThinNav"
+        target="_blank"
+        class="footer-link"
+      >
         <i class="fab fa-github"></i> Created by Diyun and ChatGPT
       </a>
     </div>
@@ -35,14 +43,14 @@ export default {
 <style scoped>
 .app-content {
   display: flex;
-  flex-direction: column; /* 垂直排列内容和版权信息 */
-  min-height: calc(100vh - 169px); /* 确保内容区域至少占据视口高度 */
+  flex-direction: column;
+  width: 100%; /* 确保容器占满宽度 */
   margin-left: 56px; /* 距离左部56px */
-  padding-bottom: 40px; /* 确保底部的版权信息不被内容覆盖 */
+  min-height: calc(100vh - 213px); /* 计算最小高度，减去header-image的高度 */
 }
 
 .content-wrapper {
-  flex-grow: 1;
+  flex-grow: 1; /* 占据剩余的垂直空间，确保footer在底部 */
 }
 
 .category {
@@ -72,7 +80,17 @@ export default {
 
 /* 版权信息样式 */
 .footer {
-  text-align: center; /* 居中显示文本 */
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 0;
+  width: 100%;
+  flex-shrink: 0;
+  /* 设置最小高度，确保 footer 在内容为空时仍然可见 */
+  min-height: 40px;
+  /* 可选：确保 footer 有垂直空间，即使内容为空 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .footer-link {

@@ -10,26 +10,26 @@
 
 <script>
 import AppSidebar from "./components/AppSidebar.vue";
-import AppContent from './components/AppContent.vue';
-import { getWebsites, getCategories } from './api/api';
+import AppContent from "./components/AppContent.vue";
+import { getWebsites, getCategories } from "./api/api";
 
 export default {
   name: "App",
   components: {
     AppSidebar,
-    AppContent
+    AppContent,
   },
   data() {
     return {
       categories: [],
-      websites: []
+      websites: [],
     };
   },
   async created() {
     try {
       const [categoriesResponse, websitesResponse] = await Promise.all([
         getCategories(),
-        getWebsites()
+        getWebsites(),
       ]);
 
       const categories = categoriesResponse; // 从 getCategories 中直接获取数据
@@ -37,44 +37,52 @@ export default {
       console.log(websites);
 
       if (!Array.isArray(websites)) {
-        throw new Error('Websites data is not an array');
+        throw new Error("Websites data is not an array");
       }
 
       // 对分类和网址进行排序、过滤和组合
       this.categories = categories
-        .map(category => {
+        .map((category) => {
           const filteredWebsites = websites
-            .filter(website => website.category_id === category.id)
+            .filter((website) => website.category_id === category.id)
             .sort((a, b) => a.order - b.order); // 按网址 order 排序
 
           // 仅返回包含网址的分类
-          return filteredWebsites.length > 0 ? {
-            ...category,
-            websites: filteredWebsites
-          } : null;
+          return filteredWebsites.length > 0
+            ? {
+                ...category,
+                websites: filteredWebsites,
+              }
+            : null;
         })
-        .filter(category => category !== null) // 过滤掉没有网址的分类
+        .filter((category) => category !== null) // 过滤掉没有网址的分类
         .sort((a, b) => a.order - b.order); // 按分类 order 排序
-
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
-  }
+  },
 };
 </script>
 
 <style>
-html, body, #app {
+html,
+body,
+#app {
+  height: 100%; /* 确保整个页面高度被占用 */
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+html,
+body {
+  height: 100%;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  max-width: 100%;
-}
-
 #app {
-  font-family: 'moe','Microsoft YaHei',Arimo,Arial,Helvetica,sans-serif;
+  font-family: "moe", "Microsoft YaHei", Arimo, Arial, Helvetica, sans-serif;
 }
 
 /* 设置整体背景颜色 */
@@ -84,10 +92,9 @@ body {
 
 .main-container {
   display: flex;
-  margin-top: 20px; /* 距离上部图片20px */
-  margin-left: 20px; /* 距离左部20px */
-  margin-right: 20px;/* 距离右部20px */
-  margin-bottom: 20px;/* 距离底部20px */
+  flex-direction: row; /* 水平排列Sidebar和Content */
+  flex-grow: 1; /* 确保主容器占满空间 */
+  margin: 20px; /* 外边距设定 */
 }
 
 html {
@@ -96,17 +103,16 @@ html {
 
 .header-image {
   width: calc(100% - 40px); /* 减去左右的间距总和 */
-  height: 113px; /* 图片高度 */
-  margin-top: 16px; /* 上间距固定16px */
-  margin-left: auto; /* 左间距，auto 会居中对齐 */
-  margin-right: auto; /* 右间距，auto 会居中对齐 */
-  background-image: url("@/assets/header.png"); /* 图片路径 */
+  height: 113px;
+  margin-top: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  background-image: url("@/assets/header.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  border-radius:8px;
+  border-radius: 8px;
 }
-
 
 /* 为了响应式布局，可以添加媒体查询来调整样式 */
 @media (max-width: 768px) {
