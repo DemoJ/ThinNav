@@ -77,10 +77,17 @@ async def save_icon_image(image: Image.Image, filename: str) -> str:
 
 async def get_icon(url):
     """尝试获取网站图标的URL"""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Connection": "keep-alive",
+    }
+
     try:
         # 获取网页内容
         async with httpx.AsyncClient(follow_redirects=True) as client:
-            response = await client.get(url)
+            response = await client.get(url, headers=headers)
             response.raise_for_status()  # 确保请求成功
 
         # 解析 HTML
@@ -97,6 +104,27 @@ async def get_icon(url):
 
                 icon_url = urljoin(url, icon_url)
 
+            print(f"Icon found: {icon_url}")
+            # 下载图标并返回 URL
+            # 如果是 png 或者 ico 格式的图标，下载图标并返回
+            if icon_url.endswith((".png", ".ico")):
+                 async with httpx.AsyncClient() as client:
+                    response = await client.get(icon_url)
+                    response.raise_for_status()
+                    icon_image = Image.open(io.BytesIO(response.content))
+                    filename = f"{urlparse(url).netloc}_icon.png"
+                    icon_url = await save_icon_image(icon_image, filename)
+                    print(f"Icon saved: {icon_url}")
+            elif icon_url.endswith(".svg"):
+                # 如果是 svg 格式的图标，异步保存到本地svg
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(icon_url)
+                    response.raise_for_status()
+                    filename = icon_url.split("/")[-1]
+                    path = f"./icons/{filename}"
+                    async with aiofiles.open(path, "wb") as out_file:
+                        await out_file.write(response.content)
+                    icon_url = path
             return icon_url
         else:
             raise HTTPException(status_code=404, detail="Icon not found")
@@ -158,6 +186,26 @@ def generate_letter_icon(url):
     return image
 
 
+async def  get_title(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+
+        # 解析 HTML 内容
+        soup = BeautifulSoup(response.text, "html.parser")
+        title = soup.title.string
+        logger.info(f"Title found: {title}")
+        return title
+    except Exception as e:
+        print(f"Error fetching title from {url}: {e}")
+        return ""
+
+
+
 @router.post("/", response_model=schemas.Website)
 async def create_website(
     website: schemas.WebsiteCreate,
@@ -175,6 +223,11 @@ async def create_website(
         default_icon = generate_letter_icon(url)
         filename = f"{urlparse(url).netloc}_default.png"
         icon_url = await save_icon_image(default_icon, filename)
+
+    if not website.name:
+        website.name = await get_title(url)
+    logger.info(f"Name: {website.name}")
+
 
     # 抓取网站描述
     description = await fetch_website_description(url)
