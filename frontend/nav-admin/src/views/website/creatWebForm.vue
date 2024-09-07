@@ -37,7 +37,15 @@ const categories = ref<CategoryResult[]>([]);
 
 // 获取分类数据
 const fetchCategories = async () => {
-  categories.value = await getCategories();
+  try {
+    categories.value = await getCategories();
+    // 设置默认值，确保在数据加载完成后进行
+    if (categories.value.length > 0) {
+      newFormInline.value.category_id = categories.value[0].id;
+    }
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+  }
 };
 
 // 组件挂载时获取分类数据
@@ -57,7 +65,7 @@ const handleCategoryChange = (value: string) => {
       <el-input
         v-model="newFormInline.name"
         class="!w-[300px]"
-        placeholder="请输入网站名称"
+        placeholder="请输入网站名称,为空则使用网站标题"
       />
     </el-form-item>
     <el-form-item label="排序">

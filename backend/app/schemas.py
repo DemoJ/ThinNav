@@ -19,7 +19,7 @@ class Category(CategoryBase):
 
 # 基础Website模型
 class WebsiteBase(BaseModel):
-    name: str
+    name: Optional[str] = None
     icon_url: Optional[str] = None
     description: Optional[str] = None
     order: int
