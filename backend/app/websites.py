@@ -13,9 +13,10 @@ from . import models, schemas
 from .database import get_db
 from .auth import get_current_user
 from typing import Optional
+import logging
 
 router = APIRouter()
-
+logger = logging.getLogger(__name__)
 
 async def fetch_website_description(url: str) -> str:
     """从网站抓取描述"""
@@ -27,15 +28,27 @@ async def fetch_website_description(url: str) -> str:
             response = await client.get(url, headers=headers)
             response.raise_for_status()
 
-            # 处理可能的重定向
-            final_url = response.url
-            print(f"Final URL after redirects: {final_url}")
+        # 解析 HTML 内容
+        soup = BeautifulSoup(response.text, "html.parser")
 
-            soup = BeautifulSoup(response.text, "html.parser")
-            description_tag = soup.find("meta", attrs={"name": "description"})
-            if description_tag:
-                return description_tag.get("content", "").strip()
-            return ""
+        meta_tags = [
+            soup.find("meta", attrs={"name": "description"}),
+            soup.find("meta", attrs={"property": "og:description"}),
+            soup.find("meta", attrs={"property": "description"}),
+            soup.find("meta", attrs={"property": "twitter:description"}),
+            soup.find("meta", attrs={"itemprop": "description"}),
+            soup.find("meta", attrs={"http-equiv": "description"})
+        ]
+
+        # 遍历找到的 meta 标签列表，返回第一个有 content 属性的标签
+        for tag in meta_tags:
+            if tag and tag.get("content"):
+                logger.info(f"Description found: {tag.get('content')}")
+                return tag.get("content").strip()
+
+        # 如果没有找到，返回空字符串
+        logger.info("No description found")
+        return ""
     except Exception as e:
         print(f"Error fetching description from {url}: {e}")
         return ""
@@ -67,7 +80,7 @@ async def get_icon(url):
     try:
         # 获取网页内容
         async with httpx.AsyncClient(follow_redirects=True) as client:
-            response = await client.get(url, verify=False)
+            response = await client.get(url)
             response.raise_for_status()  # 确保请求成功
 
         # 解析 HTML
@@ -84,7 +97,7 @@ async def get_icon(url):
 
                 icon_url = urljoin(url, icon_url)
 
-            return {"icon_url": icon_url}
+            return icon_url
         else:
             raise HTTPException(status_code=404, detail="Icon not found")
 
@@ -155,6 +168,7 @@ async def create_website(
 
     # 尝试获取图标的 URL
     icon_url = await get_icon(url)
+    logger.info(f"Icon URL: {icon_url}")
 
     if not icon_url:
         # 如果图标不存在，则生成一个默认图标并保存
@@ -164,7 +178,7 @@ async def create_website(
 
     # 抓取网站描述
     description = await fetch_website_description(url)
-
+    logger.info(f"Description: {description}")
     # 创建网站条目
     db_website = models.Website(
         name=website.name,
