@@ -11,6 +11,15 @@ from typing import AsyncGenerator
 # 正式路径
 DATABASE_URL = "sqlite+aiosqlite:///db/data.db"
 
+# 判断文件是否存在，不存在则创建
+import os
+if not os.path.exists('db'):
+    os.makedirs('db')
+
+if not os.path.exists('db/data.db'):
+    with open('db/data.db', 'w') as f:
+        f.write('')
+
 # 创建异步引擎
 engine = create_async_engine(DATABASE_URL, echo=True)
 
