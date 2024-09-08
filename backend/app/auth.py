@@ -11,7 +11,7 @@ SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
-def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_delta: timedelta = timedelta(days=30)):
+def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_delta: timedelta = timedelta(days=1)):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now() + expires_delta

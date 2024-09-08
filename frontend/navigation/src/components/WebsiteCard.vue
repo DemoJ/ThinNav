@@ -103,6 +103,7 @@ export default {
   flex-direction: column; /* 使名称和描述垂直排列 */
   padding-top: 20px;
   padding-bottom: 20px;
+  padding-right: 20px;
 }
 
 .website-name {
@@ -121,7 +122,6 @@ export default {
   overflow: hidden; /* 超出部分隐藏 */
   text-overflow: ellipsis; /* 超出部分用省略号代替 */
   max-height: 3em; /* 两行文字的高度 */
-  padding-right: 44px; /* 添加右侧内边距 */
 }
 
 .tooltip {

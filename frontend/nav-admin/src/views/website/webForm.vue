@@ -87,6 +87,13 @@ const processRelativePath = (path: string) => {
   }
   return path;
 };
+
+// 限制名称输入长度
+const handleInput = (value: string) => {
+  if (value.length > 20) {
+    newFormInline.value.name = value.slice(0, 20);
+  }
+};
 </script>
 
 <template>
@@ -96,6 +103,8 @@ const processRelativePath = (path: string) => {
         v-model="newFormInline.name"
         class="!w-[300px]"
         placeholder="请输入网站名称"
+        :maxlength="20"
+        @input="handleInput"
       />
     </el-form-item>
     <el-form-item label="URL">

@@ -186,7 +186,7 @@ def generate_letter_icon(url):
     return image
 
 
-async def  get_title(url):
+async def get_title(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
@@ -198,11 +198,17 @@ async def  get_title(url):
         # 解析 HTML 内容
         soup = BeautifulSoup(response.text, "html.parser")
         title = soup.title.string
-        logger.info(f"Title found: {title}")
+
+        if title:
+            # 判断 title 长度是否超过 20 字
+            if len(title) > 20:
+                title = title[:20]  # 截取前 20 个字符
+            logger.info(f"Title found: {title}")
         return title
     except Exception as e:
         print(f"Error fetching title from {url}: {e}")
         return ""
+
 
 
 

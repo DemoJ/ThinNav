@@ -23,6 +23,12 @@ const props = withDefaults(defineProps<FormProps>(), {
 // 但该写法仅适用于 props.formInline 是一个对象类型的情况，原始类型需抛出事件
 // 推荐阅读：https://cn.vuejs.org/guide/components/props.html#one-way-data-flow
 const newFormInline = ref(props.formInline);
+// 限制名称输入长度
+const handleInput = (value: string) => {
+  if (value.length > 6) {
+    newFormInline.value.name = value.slice(0, 6);
+  }
+};
 </script>
 
 <template>
@@ -32,6 +38,8 @@ const newFormInline = ref(props.formInline);
         v-model="newFormInline.name"
         class="!w-[300px]"
         placeholder="请输入分类名称"
+        :maxlength="6"
+        @input="handleInput"
       />
     </el-form-item>
     <el-form-item label="图标">

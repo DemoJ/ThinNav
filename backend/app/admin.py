@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from .models import Admin
@@ -12,6 +13,9 @@ router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
+# 定义请求体模型
+class RefreshTokenRequest(BaseModel):
+    refreshToken: str
 
 @router.post("/token")
 async def login_for_access_token(
@@ -79,31 +83,38 @@ async def admin_login(
 
 @router.post("/refresh-token")
 async def refresh_access_token(
-    refreshToken: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    token_request: RefreshTokenRequest, db: AsyncSession = Depends(get_db)
 ):
     try:
-        print(refreshToken)
-        token_data = await refresh_token(refreshToken, db)
+        # 提取 refreshToken
+        refresh_token_str = token_request.refreshToken
+        print(f"refreshToken: {refresh_token_str}")
+        # 验证 refresh_token 的合法性，并生成新的 token
+        token_data = await refresh_token(refresh_token_str, db)
+
         # 获取当前时间
         current_time = datetime.now()
 
+        # 设置 accessToken 的过期时间（30 分钟）
         add_expires = timedelta(minutes=30)
+        accessToken_expires = int((current_time + add_expires).timestamp() * 1000)
 
-        # 将当前时间加上一分钟
-        minute_later = current_time + add_expires
-
-        # 转换为时间戳
-        accessToken_expires = int(minute_later.timestamp() * 1000)
+        # 返回新的 accessToken 和可能更新的 refreshToken
         return {
             "success": 1,
             "data": {
                 "accessToken": token_data["accessToken"],
-                "refreshToken": token_data["refreshToken"],
+                "refreshToken": token_data.get("refreshToken", refresh_token_str),  # 如果没有生成新 refreshToken，则使用旧的
                 "expires": accessToken_expires,
             },
         }
+
     except HTTPException as e:
+        # 捕获 HTTP 异常并抛出
         raise e
+    except Exception as e:
+        # 捕获其他异常并抛出 500 错误
+        raise HTTPException(status_code=500, detail="Failed to refresh token") from e
 
 
 @router.post("/change-password")

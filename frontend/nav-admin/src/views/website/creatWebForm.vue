@@ -10,7 +10,6 @@ export interface creatFormProps {
     name: string;
     order: number;
     category_id: string;
-
   };
 }
 
@@ -44,7 +43,7 @@ const fetchCategories = async () => {
       newFormInline.value.category_id = categories.value[0].id;
     }
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
+    console.error("Failed to fetch categories:", error);
   }
 };
 
@@ -57,6 +56,13 @@ onMounted(() => {
 const handleCategoryChange = (value: string) => {
   newFormInline.value.category_id = value;
 };
+
+// 限制名称输入长度
+const handleInput = (value: string) => {
+  if (value.length > 20) {
+    newFormInline.value.name = value.slice(0, 20);
+  }
+};
 </script>
 
 <template>
@@ -66,6 +72,8 @@ const handleCategoryChange = (value: string) => {
         v-model="newFormInline.name"
         class="!w-[300px]"
         placeholder="请输入网站名称,为空则使用网站标题"
+        :maxlength="20"
+        @input="handleInput"
       />
     </el-form-item>
     <el-form-item label="排序">
