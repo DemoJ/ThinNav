@@ -1,5 +1,5 @@
 <template>
-  <div class="AppSidebar">
+  <div class="AppSidebar" ref="sidebar">
     <ul>
       <li v-for="category in categories" :key="category.id">
         <i :class="`fas fa-${category.icon_url}`" class="icon"></i>
@@ -14,6 +14,35 @@ export default {
   name: 'AppSidebar',
   props: {
     categories: Array
+  },
+  data() {
+    return {
+      bottomGap: 20, // 距离底部的固定距离
+    }
+  },
+  mounted() {
+    this.adjustSidebarHeight();
+    window.addEventListener('resize', this.adjustSidebarHeight);
+    window.addEventListener('scroll', this.adjustSidebarHeight);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.adjustSidebarHeight);
+    window.removeEventListener('scroll', this.adjustSidebarHeight);
+  },
+  methods: {
+    adjustSidebarHeight() {
+      const sidebar = this.$refs.sidebar;
+      const windowHeight = window.innerHeight;
+      const sidebarRect = sidebar.getBoundingClientRect();
+      
+      let newHeight = windowHeight - sidebarRect.top - this.bottomGap;
+
+      // 确保 sidebar 高度不会小于最小值
+      const minHeight = 100; // 设置一个最小高度值
+      newHeight = Math.max(newHeight, minHeight);
+
+      sidebar.style.height = `${newHeight}px`;
+    }
   }
 };
 </script>
@@ -24,7 +53,8 @@ export default {
   width: 100%;
   max-width: 200px;
   min-width: 125px;
-  height: calc(100vh - 169px); /* 或者设置为固定高度，例如 600px */
+  height: auto; /* 移除固定高度 */
+  max-height: none; /* 移除最大高度限制，因为我们会动态计算 */
   background-color: white;
   border-radius: 8px;
   box-shadow: 0px 4px 4px rgba(240, 244, 249, 0.1);
@@ -34,6 +64,7 @@ export default {
   overflow-x: hidden; /* 隐藏水平滚动条（如果不需要的话） */
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: rgba(148, 148, 148, 0.1) transparent; /* Firefox 初始状态 */
+  margin-bottom: 20px; /* 添加底部边距 */
 }
 
 /* 对 Webkit 浏览器（如 Chrome、Safari）的自定义滚动条 */
