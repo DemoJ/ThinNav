@@ -11,3 +11,4 @@ services:
     volumes:
       - ./data/db:/app/db
       - ./data/icons:/app/icons
+    restart: always
