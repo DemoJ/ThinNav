@@ -19,5 +19,6 @@ jobs:
         with:
           context: .
           push: true
-          tags:
+          tags: |
+            registry.diyun.work/thinnav:v${{ github.run_number }}
             registry.diyun.work/thinnav:latest
