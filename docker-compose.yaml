@@ -11,9 +11,3 @@ services:
     volumes:
       - ./data/db:/app/db
       - ./data/icons:/app/icons
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
