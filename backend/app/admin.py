@@ -55,7 +55,7 @@ async def admin_login(
 
     add_expires = timedelta(minutes=30)
 
-    # 将当前时间加上一分钟
+    # 将当前时间加上30分钟
     minute_later = current_time + add_expires
 
     # 转换为时间戳

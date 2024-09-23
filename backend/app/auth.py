@@ -11,7 +11,12 @@ SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
-def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_delta: timedelta = timedelta(days=1)):
+
+def create_tokens(
+    data: dict,
+    expires_delta: timedelta = None,
+    refresh_expires_delta: timedelta = timedelta(days=1),
+):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now() + expires_delta
@@ -22,11 +27,16 @@ def create_tokens(data: dict, expires_delta: timedelta = None, refresh_expires_d
 
     # Create refresh token
     refresh_expire = datetime.now(timezone.utc) + refresh_expires_delta
-    refreshToken = jwt.encode({"exp": refresh_expire, "sub": data["sub"]}, SECRET_KEY, algorithm=ALGORITHM)
+    refreshToken = jwt.encode(
+        {"exp": refresh_expire, "sub": data["sub"]}, SECRET_KEY, algorithm=ALGORITHM
+    )
 
     return accessToken, refreshToken
 
-async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)):
+
+async def get_current_user(
+    db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     print(f"Received token: {token}")  # 添加这行来检查 token 的值
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -46,6 +56,7 @@ async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depe
     except JWTError:
         raise credentials_exception
 
+
 async def refresh_token(refreshToken: str, db: AsyncSession = Depends(get_db)):
     print(f"Received refreshToken: {refreshToken}")  # 添加这行来检查 refreshToken 的值
     try:
@@ -54,8 +65,8 @@ async def refresh_token(refreshToken: str, db: AsyncSession = Depends(get_db)):
         if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token",
-                headers={"WWW-Authenticate": "Bearer"}
+                detail="Invalid refresh token:Username is None",
+                headers={"WWW-Authenticate": "Bearer"},
             )
         result = await db.execute(select(Admin).where(Admin.username == username))
         admin = result.scalars().first()
@@ -63,13 +74,19 @@ async def refresh_token(refreshToken: str, db: AsyncSession = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
-                headers={"WWW-Authenticate": "Bearer"}
+                headers={"WWW-Authenticate": "Bearer"},
             )
-        new_access_token, new_refresh_token = create_tokens({"sub": username})  # 确保这个函数定义正确
+        # 生成新的 accessToken 和 refreshToken
+        new_access_token, new_refresh_token = create_tokens({"sub": username})
+
+        # 更新数据库中的 refreshToken
+        admin.refreshToken = new_refresh_token
+        await db.commit()
+        print(f"Update refreshToken successful.  RefreshToken: {new_refresh_token}")
         return {"accessToken": new_access_token, "refreshToken": new_refresh_token}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
