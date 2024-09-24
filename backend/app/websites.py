@@ -14,9 +14,11 @@ from .database import get_db
 from .auth import get_current_user
 from typing import Optional
 import logging
+from datetime import datetime, timezone
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
 
 async def fetch_website_description(url: str) -> str:
     """从网站抓取描述"""
@@ -37,7 +39,7 @@ async def fetch_website_description(url: str) -> str:
             soup.find("meta", attrs={"property": "description"}),
             soup.find("meta", attrs={"property": "twitter:description"}),
             soup.find("meta", attrs={"itemprop": "description"}),
-            soup.find("meta", attrs={"http-equiv": "description"})
+            soup.find("meta", attrs={"http-equiv": "description"}),
         ]
 
         # 遍历找到的 meta 标签列表，返回第一个有 content 属性的标签
@@ -108,7 +110,7 @@ async def get_icon(url):
             # 下载图标并返回 URL
             # 如果是 png 或者 ico 格式的图标，下载图标并返回
             if icon_url.endswith((".png", ".ico")):
-                 async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient() as client:
                     response = await client.get(icon_url)
                     response.raise_for_status()
                     icon_image = Image.open(io.BytesIO(response.content))
@@ -210,8 +212,6 @@ async def get_title(url):
         return ""
 
 
-
-
 @router.post("/", response_model=schemas.Website)
 async def create_website(
     website: schemas.WebsiteCreate,
@@ -234,7 +234,6 @@ async def create_website(
         website.name = await get_title(url)
     logger.info(f"Name: {website.name}")
 
-
     # 抓取网站描述
     description = await fetch_website_description(url)
     logger.info(f"Description: {description}")
@@ -246,6 +245,7 @@ async def create_website(
         description=description,
         order=website.order,
         category_id=website.category_id,
+        updated_at=datetime.now(timezone.utc),  # 使用 timezone 获取当前 UTC 时间
     )
     db.add(db_website)
     await db.commit()
@@ -292,7 +292,9 @@ async def read_websites(
             models.Website.category_id == models.Category.id,
             isouter=True,
         )
-        .order_by(models.Website.order, models.Website.updated_at.desc())  # 按 order 和 updated_at 排序
+        .order_by(
+            models.Website.order, models.Website.updated_at.desc()
+        )  # 按 order 和 updated_at 排序
     )
 
     # 如果有搜索关键词，添加模糊搜索条件
@@ -358,6 +360,7 @@ async def update_website(
 
     for key, value in website.model_dump(exclude_unset=True).items():
         setattr(db_website, key, value)
+    db_website.updated_at = datetime.now(timezone.utc)  # 更新为当前 UTC 时间
     await db.commit()
     await db.refresh(db_website)
 
