@@ -8,6 +8,8 @@ from app import categories, websites, admin,upload
 from app.database import engine, AsyncSessionLocal
 from fastapi.staticfiles import StaticFiles
 import os
+from alembic import command
+from alembic.config import Config
 
 
 app = FastAPI()
@@ -40,6 +42,9 @@ async def startup_event():
             default_admin.set_password("123456")
             session.add(default_admin)
             await session.commit()
+
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
 
 
 # 定义关闭事件处理函数

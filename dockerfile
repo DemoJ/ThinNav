@@ -40,13 +40,6 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
 
-# 复制 Alembic 配置和迁移脚本
-COPY alembic.ini .
-COPY migrations/ ./migrations/
-
-# 运行数据库迁移
-RUN alembic upgrade head
-
 # 复制并配置 Nginx
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
