@@ -31,13 +31,12 @@ export function handleEdit(row) {
           order: Number(formInline.order)
         };
 
-        const updatedCategory = await updateCategory(row.id, updatedData);
-
-        if (updatedCategory) {
+        try {
+          await updateCategory(row.id, updatedData);
           message("Category updated successfully");
           if (fetchCategories) fetchCategories(); // 更新表格数据
-        } else {
-          message("Failed to update category");
+        } catch (error) {
+          message(error.response?.data?.detail || "Failed to update category");
         }
       }
     }
@@ -65,12 +64,12 @@ export function handleCreat() {
           icon_url: formInline.icon,
           order: Number(formInline.order)
         };
-        const createdCategory = await creatCategory(creatData);
-        if (createdCategory) {
+        try {
+          await creatCategory(creatData);
           message("Category created successfully");
           if (fetchCategories) fetchCategories(); // 更新表格数据
-        } else {
-          message("Failed to create category");
+        } catch (error) {
+          message(error.response?.data?.detail || "Failed to create category");
         }
       }
     }

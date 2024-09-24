@@ -15,6 +15,11 @@ async def create_category(
     current_user: models.Admin = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    # 检查分类名称是否已存在
+    existing_category = await db.execute(select(models.Category).filter_by(name=category.name))
+    if existing_category.scalars().first():
+        raise HTTPException(status_code=400, detail="The category name already exists")
+
     db_category = models.Category(**category.model_dump())
     db.add(db_category)
     await db.commit()
@@ -40,6 +45,13 @@ async def update_category(
         db_category = await session.get(models.Category, category_id)
         if not db_category:
             raise HTTPException(status_code=404, detail="Category not found")
+
+        # 检查更新后的分类名称是否已存在
+        existing_category = await session.execute(select(models.Category).filter_by(name=category.name))
+        existing_category_instance = existing_category.scalars().first()
+        if existing_category_instance and existing_category_instance.id != category_id:
+            raise HTTPException(status_code=400, detail="The category name already exists")
+
         for var, value in vars(category).items():
             setattr(db_category, var, value) if value else None
         await session.commit()

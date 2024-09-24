@@ -51,7 +51,7 @@ export const updateCategory = async (
     return data;
   } catch (error) {
     console.error(`Failed to update category ${categoryId}:`, error);
-    return null;
+    throw error; // 重新抛出错误
   }
 };
 
@@ -77,6 +77,6 @@ export const creatCategory = async (creatData: CategoryData) => {
     return data;
   } catch (error) {
     console.error(`Failed to creat category:`, error);
-    return null;
+    throw error; // 重新抛出错误
   }
 };
