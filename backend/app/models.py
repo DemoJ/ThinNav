@@ -1,8 +1,11 @@
 # models.py
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship,declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
-from .database import Base
+from sqlalchemy.sql import func
+
+# 基础的声明式基类
+Base = declarative_base()
 
 # 定义Category模型
 class Category(Base):
@@ -22,6 +25,7 @@ class Website(Base):
     description = Column(String)
     order = Column(Integer, index=True)
     url = Column(String, nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())  # 添加更新时间字段
     category = relationship("Category", back_populates="websites")
 
 Category.websites = relationship("Website", order_by=Website.order, back_populates="category")

@@ -292,7 +292,7 @@ async def read_websites(
             models.Website.category_id == models.Category.id,
             isouter=True,
         )
-        .order_by(models.Website.order)  # 按 order 字段排序
+        .order_by(models.Website.order, models.Website.updated_at.desc())  # 按 order 和 updated_at 排序
     )
 
     # 如果有搜索关键词，添加模糊搜索条件

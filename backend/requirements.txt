@@ -11,3 +11,4 @@ Pillow==9.3.0
 tldextract==3.4.0
 aiofiles==23.1.0
 beautifulsoup4==4.12.2
+alembic==1.13.3
