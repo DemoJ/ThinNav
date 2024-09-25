@@ -2,6 +2,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from typing import List
+from datetime import datetime
 
 # 基础Category模型
 class CategoryBase(BaseModel):
@@ -25,6 +26,7 @@ class WebsiteBase(BaseModel):
     order: int
     url: str
     category_id: int
+    updated_at: Optional[datetime] = None  # 添加 updated_at 字段
 
 class WebsiteCreate(WebsiteBase):
     pass

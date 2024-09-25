@@ -11,39 +11,53 @@ import {
   handleCreat,
   setFetchWebsMethod
 } from "./webOperate";
-
-defineOptions({
-  name: "Website"
-});
+import { getCategories } from "@/api/category"; // 引入获取分类的 API
 
 const webData = ref([]);
 const pagination = ref({ current: 1, pageSize: 10, total: 0 });
 const searchKeyword = ref("");
+const categories = ref([]); // 存储分类数据
+const selectedCategory = ref(null); // 存储选中的分类
+
+// 获取分类数据
+const fetchCategories = async () => {
+  try {
+    // 直接将 API 返回值赋给 categories
+    categories.value = await getCategories();
+    console.log("分类数据获取成功：", categories.value); // 调试输出获取的数据
+  } catch (error) {
+    console.error("获取分类数据失败：", error);
+  }
+};
+
+// 在组件挂载时获取分类
+onMounted(() => {
+  fetchCategories(); // 确保在挂载时调用
+  fetchWebs(); // 获取网址数据
+  setFetchWebsMethod(fetchWebs); // 设置获取网址的方法
+});
+
+// 监听分类变化，更新网址数据
+watch(selectedCategory, newCategory => {
+  fetchWebs(searchKeyword.value, newCategory);
+});
 
 // 使用 debounce 优化搜索，延迟触发 API 请求
-const fetchWebs = debounce(async (keyword = "") => {
+const fetchWebs = debounce(async (keyword = "", category = "") => {
   const { data, total } = await getWebs({
     page: pagination.value.current || 1,
     limit: pagination.value.pageSize || 10,
-    search: keyword
+    search: keyword,
+    category: category // 添加分类参数
   });
   webData.value = data;
   pagination.value.total = total;
 }, 300);
 
-onMounted(() => {
-  fetchWebs();
-  setFetchWebsMethod(fetchWebs);
+// 监听 searchKeyword 值的变化并触发 fetchWebs
+watch(searchKeyword, newKeyword => {
+  fetchWebs(newKeyword, selectedCategory.value);
 });
-
-watch(
-  [
-    () => pagination.value.current,
-    () => pagination.value.pageSize,
-    searchKeyword
-  ],
-  ([, , keyword]) => fetchWebs(keyword)
-);
 
 const onPageSizeChange = (size: number) => {
   pagination.value.pageSize = size || 10;
@@ -87,13 +101,29 @@ const columns: TableColumnList = [
       <el-button :icon="useRenderIcon(AddFill)" @click="handleCreat()">
         新建网址
       </el-button>
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索网址"
-        style="width: 300px"
-        clearable
-        :prefix-icon="useRenderIcon(SearchIcon)"
-      />
+      <div style="display: flex; align-items: center; gap: 16px">
+        <!-- 使用 flex 布局和 gap 调整间距 -->
+        <el-select
+          v-model="selectedCategory"
+          placeholder="选择分类"
+          style="width: 200px"
+          clearable
+        >
+          <el-option
+            v-for="category in categories"
+            :key="category.id"
+            :label="category.name"
+            :value="category.id"
+          />
+        </el-select>
+        <el-input
+          v-model="searchKeyword"
+          placeholder="搜索网址"
+          style="width: 200px"
+          clearable
+          :suffix-icon="useRenderIcon(SearchIcon)"
+        />
+      </div>
     </div>
     <pure-table :data="webData" :columns="columns" class="mt-4">
       <!-- 添加上间距 -->

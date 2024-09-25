@@ -283,6 +283,7 @@ async def read_websites(
         False, description="Fetch all data without pagination"
     ),
     search: Optional[str] = Query(None, description="Search keyword for website name"),
+    category: Optional[int] = Query(None, description="Filter by category ID"),  # 添加分类参数
 ):
     # 基础查询语句，包含左连接和排序
     stmt = (
@@ -300,6 +301,10 @@ async def read_websites(
     # 如果有搜索关键词，添加模糊搜索条件
     if search:
         stmt = stmt.where(models.Website.name.ilike(f"%{search}%"))
+
+    # 如果有分类参数，添加筛选条件
+    if category:
+        stmt = stmt.where(models.Website.category_id == category)
 
     # 如果 all_data 为 True，获取所有数据
     if all_data:
