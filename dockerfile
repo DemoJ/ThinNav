@@ -47,5 +47,5 @@ COPY migrations/ ./migrations/
 # 复制并配置 Nginx
 COPY docker/web-prod.conf /etc/nginx/conf.d/default.conf
 
-# 启动 FastAPI 应用和 Nginx 服务
-CMD uvicorn main:app --host 0.0.0.0 --port 8000 & nginx -g "daemon off;"
+# 启动 Alembic 迁移，并在之后启动 FastAPI 应用和 Nginx 服务
+CMD uvicorn main:app --host 0.0.0.0 --port 8000 && alembic upgrade head & nginx -g "daemon off;"

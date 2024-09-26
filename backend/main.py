@@ -1,23 +1,18 @@
 import uvicorn
 from fastapi import FastAPI
 from sqlalchemy.future import select
-from app import models
 from app.models import Admin
-from app import categories, websites, admin, upload
+from app import categories, websites, admin, upload, models
 from app.database import engine, AsyncSessionLocal
 from fastapi.staticfiles import StaticFiles
 import os
 import logging
-from alembic import command
-from alembic.config import Config
 
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
@@ -50,9 +45,12 @@ except Exception as e:
     logger.error(f"包含路由时出错: {e}")
     raise
 
-# 定义创建默认管理员的异步函数
+
+# 定义创建数据库及默认管理员的异步函数
 async def create_default_admin():
     try:
+        async with engine.begin() as conn:
+            await conn.run_sync(models.Base.metadata.create_all)
         async with AsyncSessionLocal() as session:
             result = await session.execute(select(Admin).limit(1))
             existing_admin = result.scalars().first()
@@ -68,6 +66,7 @@ async def create_default_admin():
         logger.error(f"创建默认管理员失败: {e}")
         raise
 
+
 # 定义启动事件处理函数
 async def startup_event():
     logger.info("应用启动中...")
@@ -78,32 +77,20 @@ async def startup_event():
         logger.error(f"启动事件处理失败: {e}")
         raise
 
+
 # 定义关闭事件处理函数
 async def shutdown_event():
     logger.info("应用关闭中...")
     # 在这里添加关闭时需要执行的代码，例如释放资源
     logger.info("应用已关闭")
 
+
 # 注册生命周期事件处理函数
 app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
-# 定义运行 Alembic 迁移的函数
-def run_alembic_upgrade():
-    try:
-        logger.info("运行 Alembic 迁移...")
-        alembic_cfg = Config("alembic.ini")
-        command.upgrade(alembic_cfg, "head")
-        logger.info("Alembic 迁移完成")
-    except Exception as e:
-        logger.error(f"Alembic 迁移失败: {e}")
-        raise
-
 if __name__ == "__main__":
     try:
-        # 运行 Alembic 迁移
-        run_alembic_upgrade()
-
         # 启动 Uvicorn 服务器
         logger.info("启动 Uvicorn 服务器...")
         uvicorn.run(
@@ -111,8 +98,8 @@ if __name__ == "__main__":
             host="127.0.0.1",
             port=8000,
             reload=True,
-            reload_dirs=["./backend"],  # 确保这个目录存在且正确
-            log_level="info"
+            reload_dirs=["./backend"],
+            log_level="info",
         )
     except Exception as e:
         logger.error(f"应用启动失败: {e}")
