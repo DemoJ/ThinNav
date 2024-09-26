@@ -98,6 +98,11 @@ class PureHttp {
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
                       })
+                      .catch(error => {
+                        // refresh token 失败,跳转到登录页
+                        useUserStoreHook().logOut();
+                        router.push("/login");
+                      })
                       .finally(() => {
                         PureHttp.isRefreshing = false;
                       });
