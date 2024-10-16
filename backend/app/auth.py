@@ -19,8 +19,7 @@ def generate_secret_key(length=32):
 
 def get_or_create_secret_key():
     # 获取当前脚本所在的目录
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    env_path = os.path.join(current_dir, ".env")
+    env_path = os.path.join(".", ".env")
 
     # 如果 .env 文件存在，尝试读取 SECRET_KEY
     if os.path.exists(env_path):
