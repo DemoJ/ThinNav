@@ -6,8 +6,42 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from .database import get_db
 from .models import Admin
+import secrets
+import string
+import os
+from dotenv import load_dotenv, set_key
 
-SECRET_KEY = "-84iFQMj5Hd_PV2v2tkDKdPG5hpFTsi_wEtyp8h7-fs"
+
+def generate_secret_key(length=32):
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def get_or_create_secret_key():
+    # 获取当前脚本所在的目录
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    env_path = os.path.join(current_dir, ".env")
+
+    # 如果 .env 文件存在，尝试读取 SECRET_KEY
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        secret_key = os.getenv("JWT_SECRET_KEY")
+
+        if secret_key:
+            print("从现有 .env 文件中读取 SECRET_KEY")
+            return secret_key
+
+    # 如果 .env 不存在或没有 SECRET_KEY，生成新的
+    new_secret_key = generate_secret_key()
+
+    # 创建或更新 .env 文件
+    set_key(env_path, "JWT_SECRET_KEY", new_secret_key)
+
+    print(f"新的 SECRET_KEY 已生成并保存到 {env_path}")
+    return new_secret_key
+
+
+SECRET_KEY = get_or_create_secret_key()
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/token")
 
