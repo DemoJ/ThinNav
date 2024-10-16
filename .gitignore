@@ -4,10 +4,6 @@ node_modules
 *.db
 
 
-# local env files
-.env.local
-.env.*.local
-
 # Log files
 npm-debug.log*
 yarn-debug.log*
@@ -125,11 +121,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 venv/
-ENV/
-env.bak/
 venv.bak/
 
 # Spyder project settings

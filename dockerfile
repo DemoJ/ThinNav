@@ -39,7 +39,6 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
-RUN touch /app/.env
 
 # 复制 Alembic 配置和迁移脚本
 COPY alembic.ini .
