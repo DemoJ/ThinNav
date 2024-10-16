@@ -11,5 +11,5 @@ services:
     volumes:
       - ./data/db:/app/db
       - ./data/icons:/app/icons
-      - ./data/.env:/app/.env
+      - .env:/app/.env
     restart: always
