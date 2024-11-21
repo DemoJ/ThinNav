@@ -1,7 +1,7 @@
 import asyncio
 from sqlalchemy import select
-from models import Admin, Base
-from database import engine, AsyncSessionLocal
+from app.models import Admin, Base
+from app.database import engine, AsyncSessionLocal
 import logging
 
 logging.basicConfig(level=logging.INFO)
