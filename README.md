@@ -18,6 +18,12 @@ docker compose up -d
 后续愉快的创建分类及网址就完事了。  
 并且大部分网址的图标和描述不需要手动填写，在创建时会去自动获取该网站的图标和描述。
 
+### 忘记密码
+如果忘记密码，可进入项目目录执行以下重置密码脚本：  
+```bash
+docker compose exec app python reset_password.py
+```
+
 ### 技术栈说明
 用户端：Vue.js  
 后台管理：pureAdmin  
