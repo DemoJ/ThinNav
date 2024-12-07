@@ -1,3 +1,4 @@
+import os
 import asyncio
 from sqlalchemy import select, text
 from app.models import Admin, Base
@@ -6,9 +7,6 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Alembic目标版本号
-ALEMBIC_TARGET_VERSION = "4f57cda68ec2"
 
 async def init_db():
     try:
@@ -49,4 +47,14 @@ async def init_db():
         raise
 
 if __name__ == "__main__":
-    asyncio.run(init_db())
+    # Alembic目标版本号
+    ALEMBIC_TARGET_VERSION = "4f57cda68ec2"
+
+    # 判断文件是否存在，不存在则创建
+    if not os.path.exists('db'):
+        os.makedirs('db')
+
+    if not os.path.exists('db/data.db'):
+        with open('db/data.db', 'w') as f:
+            f.write('')
+        asyncio.run(init_db())

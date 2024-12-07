@@ -1,4 +1,3 @@
-import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from typing import AsyncGenerator
@@ -9,14 +8,6 @@ from typing import AsyncGenerator
 
 # 数据库文件路径
 DATABASE_URL = "sqlite+aiosqlite:///db/data.db"
-
-# 判断文件是否存在，不存在则创建
-if not os.path.exists('db'):
-    os.makedirs('db')
-
-if not os.path.exists('db/data.db'):
-    with open('db/data.db', 'w') as f:
-        f.write('')
 
 # 创建异步引擎
 engine = create_async_engine(DATABASE_URL, echo=True)
