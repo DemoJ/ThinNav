@@ -118,7 +118,7 @@ const columns: TableColumnList = [
         </el-select>
         <el-input
           v-model="searchKeyword"
-          placeholder="搜索网址"
+          placeholder="输入网址名称"
           style="width: 200px"
           clearable
           :suffix-icon="useRenderIcon(SearchIcon)"
