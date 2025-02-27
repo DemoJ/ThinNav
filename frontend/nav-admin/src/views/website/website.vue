@@ -42,6 +42,14 @@ watch(selectedCategory, newCategory => {
   fetchWebs(searchKeyword.value, newCategory);
 });
 
+// 监听分页参数变化
+watch(
+  () => [pagination.value.current, pagination.value.pageSize],
+  () => {
+    fetchWebs(searchKeyword.value, selectedCategory.value);
+  }
+);
+
 // 使用 debounce 优化搜索，延迟触发 API 请求
 const fetchWebs = debounce(async (keyword = "", category = "") => {
   const { data, total } = await getWebs({
