@@ -1,9 +1,16 @@
 <template>
   <div id="app">
-    <div class="header-image"></div>
-    <div class="main-container">
-      <AppSidebar :categories="categories" />
-      <AppContent :categories="categories" />
+    <LoadingIndicator 
+      :is-loading="isLoading" 
+      :progress="loadingProgress" 
+      :loading-text="loadingText" 
+    />
+    <div v-show="!isLoading" class="content-fade-in">
+      <div class="header-image fade-in-down"></div>
+      <div class="main-container">
+        <AppSidebar :categories="categories" class="fade-in-right delay-200" />
+        <AppContent :categories="categories" class="fade-in delay-300" />
+      </div>
     </div>
   </div>
 </template>
@@ -11,6 +18,7 @@
 <script>
 import AppSidebar from "./components/AppSidebar.vue";
 import AppContent from "./components/AppContent.vue";
+import LoadingIndicator from "./components/LoadingIndicator.vue";
 import { getWebsites, getCategories } from "./api/api";
 
 export default {
@@ -18,19 +26,31 @@ export default {
   components: {
     AppSidebar,
     AppContent,
+    LoadingIndicator
   },
   data() {
     return {
       categories: [],
       websites: [],
+      isLoading: true,
+      loadingProgress: 0,
+      loadingText: '加载中...'
     };
   },
   async created() {
+    // 启动加载进度模拟
+    this.startLoadingProgress();
+    
     try {
+      this.loadingText = '正在获取数据...';
+      
       const [categoriesResponse, websitesResponse] = await Promise.all([
         getCategories(),
         getWebsites(),
       ]);
+
+      this.loadingProgress = 70;
+      this.loadingText = '正在处理数据...';
 
       const categories = categoriesResponse; // 从 getCategories 中直接获取数据
       const websites = websitesResponse.data; // 从 getWebsites 中提取 data 字段
@@ -57,10 +77,44 @@ export default {
         })
         .filter((category) => category !== null) // 过滤掉没有网址的分类
         .sort((a, b) => a.order - b.order); // 按分类 order 排序
+      
+      this.loadingProgress = 90;
+      this.loadingText = '准备完成...';
+      
+      // 完成加载
+      setTimeout(() => {
+        this.loadingProgress = 100;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+      }, 300);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
+      this.loadingText = '加载失败，请刷新重试';
+      this.loadingProgress = 100;
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 1500);
     }
   },
+  methods: {
+    startLoadingProgress() {
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (this.loadingProgress >= 90 || !this.isLoading) {
+          clearInterval(interval);
+          return;
+        }
+        
+        // 模拟进度增加，但不超过70%（留给实际数据加载）
+        if (progress < 70) {
+          progress += Math.random() * 3;
+          this.loadingProgress = Math.min(Math.round(progress), 70);
+        }
+      }, 200);
+    }
+  }
 };
 </script>
 
@@ -82,7 +136,8 @@ body {
 }
 
 #app {
-  font-family: "moe", "Microsoft YaHei", Arimo, Arial, Helvetica, sans-serif;
+  font-family: var(--font-family-sans);
+  color: var(--text-color-primary);
 }
 
 /* 设置整体背景颜色 */
@@ -112,6 +167,12 @@ html {
   background-size: cover;
   background-position: center;
   border-radius: 8px;
+}
+
+/* 内容淡入效果 */
+.content-fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
 }
 
 /* 为了响应式布局，可以添加媒体查询来调整样式 */

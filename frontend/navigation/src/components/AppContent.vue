@@ -1,9 +1,12 @@
 <template>
   <div class="app-content">
     <div class="content-wrapper">
-      <div v-for="category in categories" :key="category.id" class="category">
-        <p :id="category.name" class="category-name">{{ category.name }}</p>
-        <div class="card-container">
+      <div v-for="(category, index) in categories" 
+           :key="category.id" 
+           class="category fade-in" 
+           :style="{ animationDelay: `${0.3 + index * 0.1}s` }">
+        <p :id="category.name" class="category-name text-h3">{{ category.name }}</p>
+        <div class="card-container staggered-container">
           <div
             v-for="website in category.websites"
             :key="website.id"
@@ -14,11 +17,11 @@
         </div>
       </div>
     </div>
-    <div class="footer">
+    <div class="footer fade-in" style="animation-delay: 0.8s;">
       <a
         href="https://github.com/DemoJ/ThinNav"
         target="_blank"
-        class="footer-link"
+        class="footer-link text-caption"
       >
         <i class="fab fa-github"></i> Created by Diyun and ChatGPT
       </a>
@@ -55,6 +58,8 @@ export default {
 
 .category {
   margin-bottom: 40px;
+  opacity: 0; /* 初始状态为不可见 */
+  animation-fill-mode: forwards; /* 保持动画结束后的状态 */
 }
 
 .card-container {
@@ -69,13 +74,9 @@ export default {
 }
 
 .category-name {
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0px;
-  line-height: 21.95px;
-  color: rgba(0, 0, 0, 1);
-  text-align: left;
-  vertical-align: top;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text-color-primary);
 }
 
 /* 版权信息样式 */
@@ -91,14 +92,17 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0; /* 初始状态为不可见 */
+  animation-fill-mode: forwards; /* 保持动画结束后的状态 */
 }
 
 .footer-link {
-  color: rgba(0, 0, 0, 0.5); /* 设置字体颜色 */
+  color: var(--text-color-tertiary); /* 设置字体颜色 */
   text-decoration: none; /* 去除下划线 */
   display: flex;
   align-items: center; /* 垂直居中对齐图标和文本 */
   justify-content: center; /* 水平居中对齐图标和文本 */
+  transition: color 0.2s ease;
 }
 
 .footer-link i {
@@ -107,6 +111,6 @@ export default {
 }
 
 .footer-link:hover {
-  color: rgba(0, 0, 0, 0.8); /* 鼠标悬停时的字体颜色 */
+  color: var(--text-color-secondary); /* 鼠标悬停时的字体颜色 */
 }
 </style>

@@ -1,0 +1,118 @@
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 从上到下淡入 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 从左到右淡入 */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 缩放淡入 */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 应用淡入动画的类 */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.fade-in-down {
+  animation: fadeInDown 0.5s ease-out forwards;
+}
+
+.fade-in-right {
+  animation: fadeInRight 0.5s ease-out forwards;
+}
+
+.zoom-in {
+  animation: zoomIn 0.5s ease-out forwards;
+}
+
+/* 延迟类 */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-400 {
+  animation-delay: 0.4s;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+/* 初始状态：隐藏元素 */
+.initially-hidden {
+  opacity: 0;
+}
+
+/* 顺序显示的容器 */
+.staggered-container > * {
+  opacity: 0;
+}
+
+/* 顺序显示的子元素 */
+.staggered-container > *:nth-child(1) {
+  animation: fadeIn 0.5s ease-out 0.1s forwards;
+}
+
+.staggered-container > *:nth-child(2) {
+  animation: fadeIn 0.5s ease-out 0.2s forwards;
+}
+
+.staggered-container > *:nth-child(3) {
+  animation: fadeIn 0.5s ease-out 0.3s forwards;
+}
+
+.staggered-container > *:nth-child(4) {
+  animation: fadeIn 0.5s ease-out 0.4s forwards;
+}
+
+.staggered-container > *:nth-child(5) {
+  animation: fadeIn 0.5s ease-out 0.5s forwards;
+}
+
+.staggered-container > *:nth-child(n+6) {
+  animation: fadeIn 0.5s ease-out 0.6s forwards;
+} 

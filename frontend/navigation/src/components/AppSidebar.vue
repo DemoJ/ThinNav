@@ -1,9 +1,11 @@
 <template>
   <div class="AppSidebar" ref="sidebar">
     <ul>
-      <li v-for="category in categories" :key="category.id">
+      <li v-for="category in categories" :key="category.id" 
+          class="nav-item"
+          @click="navigateTo(category.name, $event)">
         <i :class="`fas fa-${category.icon_url}`" class="icon"></i>
-        <a :href="'#' + category.name">{{ category.name }}</a>
+        <span class="text-body-sm font-medium">{{ category.name }}</span>
       </li>
     </ul>
   </div>
@@ -42,6 +44,35 @@ export default {
       newHeight = Math.max(newHeight, minHeight);
 
       sidebar.style.height = `${newHeight}px`;
+    },
+    createRippleEffect(event) {
+      // 创建波纹元素
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      
+      // 获取点击位置
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      
+      // 设置波纹位置和大小
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      // 添加波纹到元素中
+      event.currentTarget.appendChild(ripple);
+      
+      // 动画结束后移除波纹元素
+      setTimeout(() => {
+        ripple.remove();
+      }, 600); // 与CSS动画时长匹配
+    },
+    navigateTo(categoryName, event) {
+      // 创建波纹效果
+      this.createRippleEffect(event);
+      
+      // 导航到对应的锚点
+      window.location.hash = categoryName;
     }
   }
 };
@@ -116,6 +147,34 @@ export default {
   line-height: 32px;
   padding: 4px 0 4px 16px;
   margin-top: 12px;
+  position: relative;
+  overflow: hidden; /* 为波纹效果添加溢出隐藏 */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%; /* 确保整行都可点击 */
+}
+
+/* 导航项悬停效果 */
+.AppSidebar li.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* 波纹效果 */
+.ripple {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none; /* 确保波纹不会干扰点击事件 */
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
 }
 
 .AppSidebar .icon {
@@ -126,14 +185,15 @@ export default {
   object-fit: contain;
 }
 
-.AppSidebar a {
-  font-size: 14px;
+.AppSidebar span {
   text-decoration: none;
-  color: rgba(0, 0, 0, 1);
+  color: var(--text-color-primary);
   cursor: pointer;
+  letter-spacing: var(--letter-spacing-normal);
+  transition: color 0.2s ease;
 }
 
-.AppSidebar a:visited {
-  color: inherit;
+.AppSidebar li:hover span {
+  color: var(--text-color-secondary);
 }
 </style>
