@@ -62,6 +62,10 @@ export default {
   animation-fill-mode: forwards; /* 保持动画结束后的状态 */
 }
 
+.category:hover .category-name::after {
+  transform: scaleX(1) translateX(-50%); /* 保持居中 */
+}
+
 .card-container {
   display: flex; /* 启用flex布局 */
   flex-wrap: wrap; /* 允许卡片换行 */
@@ -77,6 +81,29 @@ export default {
   margin-top: 0;
   margin-bottom: 16px;
   color: var(--text-color-primary);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px; /* 增加文字和下划线的间距 */
+}
+
+.category-name::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; /* 调整下划线位置 */
+  left: 50%; /* 从中间开始展开 */
+  width: 100%;
+  height: 1.5px; /* 稍微调细下划线 */
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    var(--text-color-primary) 20%,
+    var(--text-color-secondary) 50%,
+    var(--text-color-primary) 80%,
+    transparent 100%
+  );
+  opacity: 0.6; /* 降低不透明度使效果更柔和 */
+  transform: scaleX(0) translateX(-50%); /* 确保从中间展开 */
+  transform-origin: center;
+  transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1); /* 使用更平滑的缓动函数 */
 }
 
 /* 版权信息样式 */
@@ -102,15 +129,21 @@ export default {
   display: flex;
   align-items: center; /* 垂直居中对齐图标和文本 */
   justify-content: center; /* 水平居中对齐图标和文本 */
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .footer-link i {
   margin-right: 8px; /* 图标与文本之间的间距 */
   font-size: 16px; /* 图标大小 */
+  transition: transform 0.3s ease;
 }
 
 .footer-link:hover {
   color: var(--text-color-secondary); /* 鼠标悬停时的字体颜色 */
+  transform: scale(1.1);
+}
+
+.footer-link:hover i {
+  transform: rotate(360deg);
 }
 </style>

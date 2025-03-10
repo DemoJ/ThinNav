@@ -71,8 +71,18 @@ export default {
       // 创建波纹效果
       this.createRippleEffect(event);
       
-      // 导航到对应的锚点
-      window.location.hash = categoryName;
+      // 查找目标元素
+      const targetElement = document.getElementById(categoryName);
+      if (targetElement) {
+        // 使用 scrollIntoView 进行平滑滚动
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // 更新 URL，但不触发默认的滚动行为
+        history.pushState(null, '', `#${categoryName}`);
+      }
     }
   }
 };
