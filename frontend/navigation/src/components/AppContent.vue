@@ -50,6 +50,8 @@ export default {
   width: 100%; /* 确保容器占满宽度 */
   margin-left: 56px; /* 距离左部56px */
   min-height: calc(100vh - 213px); /* 计算最小高度，减去header-image的高度 */
+  position: relative; /* 添加相对定位，使footer能够在其内部绝对定位 */
+  padding-bottom: 60px; /* 为footer留出空间 */
 }
 
 .content-wrapper {
@@ -109,10 +111,11 @@ export default {
 /* 版权信息样式 */
 .footer {
   text-align: center;
-  margin-top: 20px;
   padding: 10px 0;
   width: 100%;
-  flex-shrink: 0;
+  position: absolute; /* 使用绝对定位 */
+  bottom: 20px; /* 距离底部固定20px */
+  left: 0;
   /* 设置最小高度，确保 footer 在内容为空时仍然可见 */
   min-height: 40px;
   /* 可选：确保 footer 有垂直空间，即使内容为空 */
