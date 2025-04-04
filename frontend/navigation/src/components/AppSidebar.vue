@@ -8,6 +8,8 @@
         <span class="text-body-sm font-medium">{{ category.name }}</span>
       </li>
     </ul>
+    <!-- 添加底部填充元素，确保有20px的空间 -->
+    <div class="sidebar-bottom-spacer"></div>
   </div>
 </template>
 
@@ -23,27 +25,74 @@ export default {
     }
   },
   mounted() {
+    // 立即设置初始高度
     this.adjustSidebarHeight();
+    
+    // 确保在DOM更新后调整高度
+    this.$nextTick(this.adjustSidebarHeight);
+    
+    // 保留一个短延迟，确保样式已完全应用
+    setTimeout(this.adjustSidebarHeight, 0);
+    
+    // 监听window事件
     window.addEventListener('resize', this.adjustSidebarHeight);
     window.addEventListener('scroll', this.adjustSidebarHeight);
+    window.addEventListener('load', this.adjustSidebarHeight);
+    
+    // 创建MutationObserver监听DOM变化
+    if (window.MutationObserver) {
+      this.observer = new MutationObserver(this.adjustSidebarHeight);
+      this.observer.observe(document.body, { 
+        childList: true, 
+        subtree: true 
+      });
+    }
+    
+    // 强制在加载完成延迟后再次调整（确保所有资源加载完成）
+    window.setTimeout(this.adjustSidebarHeight, 1000);
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.adjustSidebarHeight);
     window.removeEventListener('scroll', this.adjustSidebarHeight);
+    window.removeEventListener('load', this.adjustSidebarHeight);
+    
+    // 清理MutationObserver
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  },
+  watch: {
+    categories: {
+      handler() {
+        // 当分类数据变化时，重新计算sidebar高度
+        this.$nextTick(() => {
+          this.adjustSidebarHeight();
+        });
+      },
+      deep: true
+    }
   },
   methods: {
     adjustSidebarHeight() {
       const sidebar = this.$refs.sidebar;
-      const windowHeight = window.innerHeight;
-      const sidebarRect = sidebar.getBoundingClientRect();
+      if (!sidebar) return;
       
-      let newHeight = windowHeight - sidebarRect.top - this.bottomGap;
-
-      // 确保 sidebar 高度不会小于最小值
-      const minHeight = 100; // 设置一个最小高度值
-      newHeight = Math.max(newHeight, minHeight);
-
-      sidebar.style.height = `${newHeight}px`;
+      // 计算可用窗口高度
+      const windowHeight = window.innerHeight;
+      
+      // 获取sidebar当前的顶部位置
+      const sidebarTop = sidebar.getBoundingClientRect().top;
+      
+      // 计算sidebar的最大高度：窗口高度 - 顶部位置 - 底部间距
+      const maxHeight = windowHeight - sidebarTop - this.bottomGap;
+      
+      // 设置最大高度（不再动态设置height属性）
+      sidebar.style.maxHeight = `${Math.max(maxHeight, 100)}px`;
+      
+      // 移除不必要的样式设置，依赖CSS中的margin-bottom
+      if (sidebar.style.marginBottom !== `${this.bottomGap}px`) {
+        sidebar.style.marginBottom = `${this.bottomGap}px`;
+      }
     },
     createRippleEffect(event) {
       // 创建波纹元素
@@ -94,18 +143,29 @@ export default {
   width: 100%;
   max-width: 200px;
   min-width: 125px;
-  height: auto; /* 移除固定高度 */
-  max-height: none; /* 移除最大高度限制，因为我们会动态计算 */
   background-color: white;
   border-radius: 8px;
   box-shadow: 0px 4px 4px rgba(240, 244, 249, 0.1);
   position: sticky;
-  top: 20px; /* 设置当 sidebar 距离屏幕顶部 20px 时开始悬浮 */
-  overflow-y: auto; /* 显示垂直滚动条 */
-  overflow-x: hidden; /* 隐藏水平滚动条（如果不需要的话） */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(148, 148, 148, 0.1) transparent; /* Firefox 初始状态 */
-  margin-bottom: 20px; /* 添加底部边距 */
+  top: 20px; /* 顶部固定距离 */
+  margin-bottom: 20px; /* 保持底部边距 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 148, 148, 0.1) transparent;
+  display: flex;
+  flex-direction: column;
+  
+  /* 高度调整 */
+  height: auto;
+  max-height: calc(100vh - 40px); /* 视口高度减去顶部和底部边距 */
+}
+
+/* 添加底部填充元素样式 */
+.sidebar-bottom-spacer {
+  height: 20px;
+  min-height: 20px;
+  width: 100%;
 }
 
 /* 对 Webkit 浏览器（如 Chrome、Safari）的自定义滚动条 */
@@ -134,14 +194,6 @@ export default {
 /* Firefox 滚动条颜色 */
 .AppSidebar:hover {
   scrollbar-color: rgba(148, 148, 148, 0.1) transparent; /* 鼠标悬停时滚动条颜色 */
-}
-
-.AppSidebar {
-  overflow: hidden; /* 初始隐藏滚动条 */
-}
-
-.AppSidebar:hover {
-  overflow-y: auto; /* 鼠标悬停时显示滚动条 */
 }
 
 .AppSidebar ul {
