@@ -6,7 +6,7 @@ export const uploadIcon = async (formData: FormData) => {
   try {
     const response = await http.request<{ icon_url: string }>(
       "post",
-      baseUrlApi("upload/"),
+      baseUrlApi("upload/upload/"),
       {
         headers: {
           "Content-Type": "multipart/form-data"
@@ -28,7 +28,7 @@ export const getIconUrl = async (url: string) => {
   try {
     const response = await http.request<{ icon_url: string }>(
       "post",
-      baseUrlApi("get_icon/"),
+      baseUrlApi("upload/get_icon/"),
       {
         headers: {
           "Content-Type": "application/json"

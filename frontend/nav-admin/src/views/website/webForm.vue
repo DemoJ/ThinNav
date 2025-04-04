@@ -24,7 +24,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     order: null,
     description: "",
     category_id: "",
-    url: ""
+    url: "",
+    web_id: null
   })
 });
 
@@ -81,7 +82,11 @@ const handleIconUpload = async (event: Event) => {
 const VITE_PUBLIC_PATH = import.meta.env.VITE_PUBLIC_PATH || "/";
 
 const processRelativePath = (path: string) => {
-  if (path.startsWith("./")) {
+  if (!path) return "";
+  
+  if (path.startsWith("./icons/")) {
+    return `/api/icons/${path.slice(8)}`;
+  } else if (path.startsWith("./")) {
     const basePath = import.meta.env.PROD ? "/" : VITE_PUBLIC_PATH;
     return `/api${basePath}${path.slice(2)}`;
   }
@@ -111,7 +116,7 @@ const handleInput = (value: string) => {
       <el-input
         v-model="newFormInline.url"
         class="!w-[300px]"
-        placeholder="请输入网站url，包含“http(s)://”"
+        placeholder="请输入网站url，包含'http(s)://'"
       />
     </el-form-item>
     <el-form-item label="图标">
